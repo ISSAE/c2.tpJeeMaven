@@ -1,0 +1,181 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+
+
+  
+  <link type="text/css" href="http://liris.cnrs.fr/emc/emc.css" rel="stylesheet" />
+
+
+  
+  <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type" />
+
+  
+  <title>Aide &agrave; la r&eacute;alisation de fonctions JavaScript</title>
+</head>
+
+
+
+<body>
+
+
+<h1>Quelques astuces JavaScript dont vous pourrez avoir besoin
+pour
+r&eacute;aliser ce devoir</h1>
+
+
+<br />
+
+
+Ce document vous permet d'&eacute;laborer des fonctions JavaScript
+dans le corps de vos pages (ind&eacute;pendantes de celles qui vous
+sont fournies dans la biblioth&egrave;que AJAX). Il est
+destin&eacute; &agrave; vous permettre de gagner du temps pour
+r&eacute;soudre quelques difficult&eacute;s techniques.<br />
+
+
+<br />
+
+
+Les indications donn&eacute;es dans cette page fonctionnent avec
+Firefox 2 et Internet Explorer 7.<br />
+
+
+<h2>Ex&eacute;cution p&eacute;riodique d'une fonction</h2>
+
+
+Pour rappeler automatiquement une m&ecirc;me fonction JavaScript au
+bout d'un intervalle de temps donn&eacute;, vous pouvez utiliser
+l'instruction <span style="font-family: Courier New;">setTimeOut()</span>.
+Exemple :<br />
+
+
+<br />
+
+
+<div style="border: thin dotted rgb(0, 0, 0); font-family: Courier New; width: 100%;">
+function boucle() {<br />
+
+
+&nbsp;&nbsp;&nbsp;
+faitQuelqueChose('par exemple, un envoi de requ&ecirc;te
+asynchrone');&nbsp;&nbsp;&nbsp; <br />
+
+
+&nbsp;&nbsp;&nbsp;
+setTimeout("boucle();", 5000);<br />
+
+
+}</div>
+
+
+<br />
+
+
+Cette fonction sera automatiquement rappel&eacute;e toutes les 5
+secondes (5000 millisecondes).
+<h2>Envoi d'une requ&ecirc;te en utilisant une fonction de
+validation
+de formulaire</h2>
+
+
+un &eacute;l&eacute;ment <span style="font-family: Courier New;">form</span> peut
+contenir un attribut
+<span style="font-family: Courier New;">onSubmit</span>,
+qui permet d'appeller une fonction de validation avant d'envoyer les
+donn&eacute;es :<br />
+
+
+<br />
+
+
+<div style="border: thin dotted rgb(0, 0, 0); font-family: Courier New; width: 100%;">&lt;form
+onsubmit="return validation()" ...&gt;<br />
+
+
+...<br />
+
+
+&lt;/form&gt;</div>
+
+
+<br />
+
+
+Du fait de la
+pr&eacute;sence obligatoire de l'instruction return dans cet
+attribut, cette fonction doit avoir une valeur de retour
+bool&eacute;enne.<br />
+
+
+<ul>
+
+
+  <li><span style="font-family: Courier New;">true</span>
+signifie que les donn&eacute;es du
+formulaire sont valid&eacute;es et que le client peut envoyer les
+donn&eacute;es de la fa&ccedil;on
+sp&eacute;cifi&eacute;e dans les autres attributs de la balise
+form,</li>
+
+
+  <li><span style="font-family: Courier New;">false</span>
+signifie que les donn&eacute;es ne sont pas valides et ne doivent
+pas
+&ecirc;tre envoy&eacute;es.</li>
+
+
+</ul>
+
+
+Si vous souhaitez faire un envoi asynchrone de donn&eacute;es, vous
+pouvez d&eacute;tourner ce m&eacute;canisme, pour que votre
+fonction JavaScript envoie elle-m&ecirc;me la requ&ecirc;te.
+Dans ce cas, elle doit renvoyer <span style="font-family: Courier New;">false</span>, pour
+que le navigateur
+s'abstienne de toute initiative inconsid&eacute;r&eacute;e
+&agrave; la fin de la fonction.<br />
+
+
+<h2>Appel d'une fonction javascript situ&eacute;e dans un
+autre cadre</h2>
+
+
+Syntaxe :<br />
+
+
+<br />
+
+
+<div style="border: thin dotted rgb(0, 0, 0); font-family: Courier New; width: 100%;">top.nomducadre.nomdelafonction();</div>
+
+
+<br />
+
+
+Le nom du cadre est celui sp&eacute;cifi&eacute; dans
+l'attribut <span style="font-family: Courier New;">name</span>
+de l'&eacute;l&eacute;ment <span style="font-family: Courier New;">frame</span>.<br />
+<h2>R&eacute;f&eacute;rences JavaScript</h2>
+<h3>Tutoriaux et exemples de code source</h3>
+<ul>
+  <li><a href="http://www.toutjavascript.com/">Tout JavaScript</a></li>
+  <li><a href="http://www.javascriptfr.com/">JavaScriptFr</a></li>
+  <li><a href="http://www.commentcamarche.net/javascript/jsintro.php3">CommentCaMarche</a></li>
+  <li><a href="http://javascript.developpez.com/">Developpez.com</a></li>
+  <li>...</li>
+</ul>
+<h3>R&eacute;f&eacute;rences des langages</h3>
+<ul>
+  <li><a href="http://developer.mozilla.org/fr/docs/JavaScript">JavaScript (moteur Gecko : Firefox, Opera, Safari)</a></li>
+  <li><a href="http://msdn2.microsoft.com/en-us/library/hbxc2t98.aspx">JScript (Internet Explorer)</a></li>
+</ul>
+<h3>AJAX</h3>
+<ul>
+  <li><a href="http://developer.mozilla.org/fr/docs/AJAX">http://developer.mozilla.org/fr/docs/AJAX</a></li>
+  <li><a href="http://www.xul.fr/xml-ajax.html">http://www.xul.fr/xml-ajax.html</a></li>
+  <li><a href="http://www.commentcamarche.net/ajax/ajax-intro.php3">http://www.commentcamarche.net/ajax/ajax-intro.php3</a></li>
+  <li><a href="http://javascript.developpez.com/cours/#ajax">http://javascript.developpez.com/cours/#ajax</a></li>
+</ul>
+</body>
+</html>

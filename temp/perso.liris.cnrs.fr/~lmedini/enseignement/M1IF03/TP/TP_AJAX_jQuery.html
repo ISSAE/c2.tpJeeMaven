@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<meta http-equiv="Content-Language" content="fr" />
+<meta http-equiv="Author" content="Lionel Médini" />
+<link rel="stylesheet" type="text/css" media="screen" href="https://perso.liris.cnrs.fr/~lmedini/enseignement/medini.css" />
+<link rel="stylesheet" type="text/css" media="print" href="https://perso.liris.cnrs.fr/~lmedini/enseignement/medini-print.css" />
+<script type="text/javascript" src="https://perso.liris.cnrs.fr/~lmedini/js/menu.js"></script>
+<title>M1IF03 - TP5 : AJAX</title>
+<style>
+dt {font-weight: bold; color: grey}
+</style>
+</head>
+<body>
+<div id="principale">
+<h1>TP 5 : AJAX</h1>
+<h2 id="objectifs">Objectifs p&eacute;dagogiques du TP</h2>
+<ul>
+<li>Se familiariser avec les m&eacute;canismes de base des
+technologies AJAX</li>
+<li>Traiter des donn&eacute;es re&ccedil;ues de
+mani&egrave;re asynchrone c&ocirc;t&eacute; client&nbsp;</li>
+</ul>
+<h2 id="outils">Outils</h2>
+<ul>
+<li><span style="font-weight: bold;">Logiciels install&eacute;s sur les machines de TP :</span> Navigateurs Web, EDI NetBeans  / Eclipse / IntelliJ, serveur Tomcat</li>
+<li><span style="font-weight: bold;">Logiciels que vous pouvez installer chez vous :</span> idem.</li>
+<li><b>Tutoriels :</b> voir partie "Liens utiles" de la page d'accueil du cours</li>
+<li><span style="font-weight: bold;">Biblioth&egrave;que de fonctions JavaScript</span> qui r&eacute;alisent l'envoi de la requ&ecirc;te et le traitement de la r&eacute;ponse en asynchrone : disponible <a href="ajax.js">ici</a></li>
+</ul>
+<h2 id="references">R&eacute;f&eacute;rences</h2>
+<ul>
+<li>Rappels de <a href="https://perso.liris.cnrs.fr/romuald.thion/dokuwiki/doku.php?id=enseignement:lifap5:start">programmation fonctionnelle en JavaScript</a> (LIFAP5)</li>
+ <li><a href="Aide_JavaScript.html">Quelques astuces JavaScript</a> dont vous pourrez avoir besoin pour ce TP</li>
+<li>Un <a href="https://perso.liris.cnrs.fr/~lmedini/enseignement/TER">exemple d'utilisation</a> de la bibliothèque JavaScript fournie</li>
+<li>La doc de l'<a href="http://api.jquery.com/">API jQuery</a></li>
+<li> Le moteur de templating <a href="https://github.com/janl/mustache.js">MustacheJS</a></li>
+</ul>
+
+<h2 id="premiere_app">1. premi&egrave;re application</h2>
+<p>Dans un premier temps, vous allez r&eacute;aliser une application&nbsp;simple&nbsp;en Ajax qui se contente d'afficher l'heure sur le client en interrogeant le serveur de mani&egrave;re asynchrone. Pour cela, un projet pré-configuré est disponible ici : <a href="https://forge.univ-lyon1.fr/LIONEL.MEDINI/m1if03-tpchat-ajax">https://forge.univ-lyon1.fr/LIONEL.MEDINI/m1if03-tpchat-ajax</a>. Clonez le repo de ce projet. Quelques infos sur ce projet :
+
+<dl>
+<dt>Commande de démarrage</dt>
+<dd><span class="code">mvn jetty:run</span></dd>
+<dt>Adresse de la page d'accueil</dt>
+<dd><span class="code">http://localhost:8080/index.html</span></dd>
+<dd>Cette page télécharge directement la bibliothèque AJAX décrite en cours (<span style="font-style: italic;">cf.</span> rubrique "Outils")<!-- et la bibliothèque Mustache.JS-->.</dd>
+<dd>Rappel : la fonction principale de la biblioth&egrave;que AJAX s'appelle <span style="font-family: Courier New;">loadXMLAsynchroneously</span> et prend les param&egrave;tres suivants :
+<ul>
+<li>le nom de la m&eacute;thode HTTP utilis&eacute;e (<span style="font-family: Courier New;">'GET'</span> ou <span style="font-family: Courier New;">'POST'</span>),</li>
+<li>l'URL relative de la ressource qui g&eacute;n&egrave;re le document XML,</li>
+<li>les param&egrave;tres &eacute;ventuels de cette requ&ecirc;te (<span style="font-family: Courier New;">'toto=12&amp;titi=nimportequoi'</span>, ou <span style="font-family: Courier New;">null</span> sinon),</li>
+<li>la valeur de l'attribut <span style="font-family: Courier New;">id</span> de l'&eacute;l&eacute;ment de la page qui doit recevoir les donn&eacute;es.</li>
+</ul></dd>
+<dt>Adresse de la page JSP qui donne l'heure côté serveur</dt><dd><span class="code">http://localhost:8080/time.jsp</span></dd>
+</dl>
+
+<p>Dans la page d'accueil :</p>
+<ul>
+<li>ajoutez à l'élément <span style="font-family: Courier New;">body</span> un attribut <span style="font-family: Courier New;">onload</span>, pour appeler la fonction&nbsp;<span style="font-family: Courier New;">loadXMLAsynchroneously</span>, pour qu'elle envoie une requ&ecirc;te au serveur Web pour r&eacute;cup&eacute;rer l'heure dans la page JSP</li>
+<!--li>Créez une variable Javascript contenant un template Mustache</li-->
+<li>&eacute;crivez une nouvelle fonction JavaScript qui génère le code HTML correspondant <!--à l'aide de ce template, -->et rajoute ce code dans le contenu de la div <span class="code">timeDiv</span> avec le DOM</li>
+<li>faites en sorte que l'heure se recharge dynamiquement toutes les secondes (<span style="font-style: italic;">cf.</span> rubrique "R&eacute;f&eacute;rences")</li>
+</ul>
+
+<h3>Question bonus : transformation XSLT</h3>
+<ul>
+<li>C&ocirc;t&eacute; client, modifiez votre fonction de traitement pour qu'elle utilise un moteur XSLT pour réaliser la transformation du XML en un fragment XHTML</li>
+<li>Créez une feuille de style XSLT pour transformer le document re&ccedil;u en un document SVG affichant une horloge &agrave; aiguilles et int&eacute;grez ce document SVG dans votre page Web.</li>
+</ul>
+
+<h2 id="reprise_chat">2. Reprise de votre application de chat</h2>
+<p>Dans cette partie, vous continuerez à travailler sur votre application de chat des TPs précédents. Actuellement, votre application est capable de tester si le client dispose ou non des derniers&nbsp;messages envoy&eacute;s et de lui renvoyer la liste compl&egrave;te sinon. D'autre part, les différentes ressources gérées côté serveur sont exposées selon les principes de REST. Il reste que :</p>
+<ul>
+<li>l'actualisation provoque un clignotement de la page toutes les 5 secondes</li>
+<li>l'utilisation d'un iframe est n&eacute;cessaire pour ne pas que l'actualisation de la page efface le texte que l'utilisateur peut &ecirc;tre en train de taper</li>
+<li>&agrave; chaque nouveau message, le client re&ccedil;oit l'int&eacute;gralit&eacute; de la liste,
+alors qu'il n'aurait besoin que des messages post&eacute;rieurs &agrave; ceux qu'il conna&icirc;t d&eacute;j&agrave;</li>
+</ul>
+<p>Vous allez donc <strong>concevoir une nouvelle version du client de l'application</strong>. Sur le m&ecirc;me mod&egrave;le que dans la question pr&eacute;c&eacute;dente, ce client t&eacute;l&eacute;chargera de mani&egrave;re asynchrone les messages qui lui manqueront (et uniquement ceux-ci), et les rajoutera &agrave; l'interface de chat sans effacement de la page affich&eacute;e ni interruption de la t&acirc;che de l'utilisateur.</p>
+
+<p>Les scripts que vous exécuterez côté client interrogeront les mêmes ressources (i.e. le back-office de votre application en Spring et REST, qui donne accès à toutes les ressources de votre application) que la version HTML de votre chat, mais n'obtiendront pas nécessairement les mêmes représentations de celles-ci. Les deux versions de votre application (full HTML et AJAX) pourront donc coexister et fonctionner en même temps.</p>
+
+<p>Dans un premier temps, vous réaliserez le squelette de l'application sous forme de Single-Page Application (SPA) et avec jQuery (<strong>utilisez un <a href="https://en.wikipedia.org/wiki/Content_delivery_network">CDN</a></strong>). Ensuite, vous mettrez en place les scripts de communication asynchrones avec le serveur.</p>
+
+<h3 id="spa">Single-Page Application</h3>
+<p>Vous allez réaliser l'application côté client sous forme de SPA. Le client n'aura qu'une seule page HTML à charger, et la sélection de la vue se fera en fonction du hash (la partie de l'URL après le caractère <span class="code">#</span>) de la page.</p>
+
+<p>L'application côté client sera constituée d'une page HTML statique (pas de génération dynamique côté serveur), contenant l'ensemble des vues nécessaires à son fonctionnement :</p>
+
+<ul>
+    <li>Menu de l'application : permet d'accéder directement aux différentes vues de l'application&nbsp;; les vues qui nécessitent d'être connecté ne devront pas être accessibles tant que l'utilisateur n'aura pas entré un pseudo</li>
+    <li>Accueil de l'application (utilisateur non connecté) : formulaire permettant de se connecter</li>
+    <li>Liste des salons (utilisateur connecté) : affiche la liste des salons. Permet de créer un salon (formulaire) et d'accéder à un lien pour se déconnecter</li>
+    <li>Liste des utilisateurs (utilisateur connecté) : affiche la liste des utilisateurs connus par le serveur (connectés ou non) et fournit un lien pour se déconnecter</li>
+    <li>Salon (utilisateur connecté) : interface de chat comprenant un <span class="code">div</span> destiné à afficher la liste des messages (avec un lien vers chacun d'eux), un formulaire de saisie et un lien de sortie vers la liste des salons</li>
+    <li>Message (utilisateur connecté) : permet d'afficher, de modifier ou de supprimer un message donné, et comporte également un lien de retour au salon</li>
+    <li>Déconnexion (utilisateur connecté) : affiche un texte demandant de confirmer, un lien pour revenir à la liste des salons et un formulaire pour se déconnecter effectivement&nbsp;; en cas de déconnexion, l'utilisateur peut choisir de se "supprimer" de la liste des utilisateurs du serveur</li>
+</ul>
+
+<p>Pour vous faire gagner du temps, une version de cette page vous est proposée <a href="https://perso.liris.cnrs.fr/lionel.medini/enseignement/M1IF03/Tutoriels/exemples/SPA/chat_ajax_base.html">ici</a>. &Agrave; vous d'utiliser jQuery correctement (à l'aide de l'exemple vu en cours) pour :</p>
+
+<ol>
+    <li>déplier / replier le menu quand on clique sur son titre</li>
+    <li>mettre en place un mécanisme de routage qui affiche la vue correspondant au hash sélectionné</li>
+</ol>
+
+<p class="bleu">&Agrave; ce stade, vous devez avoir une SPA non fonctionnelle, mais dont les différentes vues s'affichent quand on clique sur les menus ou sur les liens.</p>
+
+<h3 id="ajax-chat">AJAX</h3>
+<p>Vous allez maintenant utiliser JavaScript et jQuery pour les requêtes asynchrones au serveur :</p>
+<ul>
+<li>connexion / déconnexion d'un utilisateur : ajout / suppression de l'utilisateur dans l'application</li>
+<li>entrée / sortie d'un salon : création si celui-ci n'existe pas, navigation (<span class="code">window.location</span> en JavaScript) une fois qu'il a été créé</li>
+<li>chat : gestion des mécanismes de communication asynchrone avec le serveur pour l'échange de messages :
+    <ol>
+        <li>requêtez le serveur pour récupérer les nouveaux messages, traiter la réponse et l'ajouter à ce div (<span style="font-style: italic;">cf</span>. CM). Vous pouvez repartir de la dernière question du TP précédent, dans laquelle le client interroge une conversation en indiquant dans la requête le numéro du dernier message reçu et le serveur renvoie la partie de cette conversation, en utilisant la négociation de contenus pour en renvoyer une représentation compréhensible par le client.</li>
+        <li>Utilisez un outil de templating de votre choix (parmi ceux présentés en cours) pour générer la vue correspondant aux nouveaux messages reçus</li>
+        <li>Faites en sorte que le script de rechargement se relance asynchroniquement toutes les 5 secondes.</li>
+        <li>faites en sorte que le formulaire de saisie de messages envoie chaque nouveau message en asynchrone à la conversation, mais sans en afficher la r&eacute;ponse. Pour cela, utilisez les fonctions de validation JavaScript (<span style="font-style: italic;">cf</span>. rubrique "R&eacute;f&eacute;rences").</li>
+    </ol>
+</li>
+<li>message : opérations CRUD de gestion d'un message (U & D uniquement possibles si le message est le dernier de la liste)</li>
+</ul>
+
+<h4>Récupération des nouveaux messages</h4>
+
+<p>Pour fixer les idées, les conversations doivent renvoyer une représentation XML équivalente au format ci-dessous&nbsp;:</p>
+
+<div style="border: thin dotted rgb(0, 0, 0); font-family: Courier New; width: 100%;">&lt;?xml
+version="1.0" encoding="ISO-8859-1" ?&gt;<br />
+&lt;Messages&gt;<br />
+&nbsp;
+&lt;Message id="m10"&gt;<br />
+&nbsp;&nbsp;&nbsp;
+&lt;Auteur&gt;toto&lt;/Auteur&gt;<br />
+&nbsp;&nbsp;&nbsp;
+&lt;Texte&gt;Message1&lt;/Texte&gt;<br />
+&nbsp;
+&lt;/Message&gt;<br />
+&nbsp;
+&lt;Message id="m11"&gt;<br />
+&nbsp;&nbsp;&nbsp;
+&lt;Auteur&gt;titi&lt;/Auteur&gt;<br />
+&nbsp;&nbsp;&nbsp;
+&lt;Texte&gt;Message2&lt;/Texte&gt;<br />
+&nbsp;
+&lt;/Message&gt;<br />
+&nbsp;
+&lt;Message id="m12"&gt;<br />
+&nbsp;&nbsp;&nbsp;
+&lt;Auteur&gt;tata&lt;/Auteur&gt;<br />
+&nbsp;&nbsp;&nbsp;
+&lt;Texte&gt;Message3&lt;/Texte&gt;<br />
+&nbsp;
+&lt;/Message&gt;<br />
+&lt;/Messages&gt;</div>
+
+<h4>JSON</h4>
+<p>Alternativement, vous pouvez s&eacute;rialiser les objets en JSON (voir cours et <a href="http://www.json.org/">http://www.json.org/</a>) plutôt qu'en XML.</p>
+
+<p><strong>Remarque :</strong> reprenez&nbsp;ce que vous avez fait au TP2, pour ne pas renvoyer des
+documents vides si aucun nouveau message n'a besoin d'&ecirc;tre r&eacute;cup&eacute;r&eacute;.</p>
+
+<h2 id="rendu">Rendu du TP</h2>
+<p>Le TP complet (client HTML avec iframe, ressources RESTful, client AJAX) est à rendre pour le <strong>mardi 11 décembre 2018 à 23h59.</strong></p>
+
+<h3 id="recommandation_forme">Recommandations / rappels</h3>
+
+<ul>
+<li>Ne rendez que la derni&egrave;re partie (votre application de chat et pas la partie horloge)</li>
+<li>Si vous avez fait l'horloge SVG, vous pouvez toutefois l'inclure à la page d'accueil de l'application de chat AJAX pour qu'elle soit prise en compte</li>
+<li>"Mavenisez" votre travail si ce n'est pas déjà fait ; <strong>ne committez pas le répertoire target</strong></li>
+<li>vérifiez que vous avez bien indiqué l'URL de votre projet dans Tomuss (et que vous avez l amême URL que votre binôme)</li>
+<li>v&eacute;rifiez que les liens entre les diff&eacute;rents fichiers que vous allez rendre ne font pas r&eacute;f&eacute;rence &agrave; votre syst&egrave;me de fichier propre ou ne contiennent <strong>pas d'URI absolues</strong>.</li>
+<li>n'oubliez pas de faire en sorte que vos documents soient en (X)HTML valide, que des feuilles de style CSS leur soient associ&eacute;s et que les scripts soient dans des fichiers s&eacute;par&eacute;s.</li>
+</ul>
+</div>
+<div id="license"><a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/fr/"><img alt="Licence Creative Commons" style="border-width:0" src="http://i.creativecommons.org/l/by-nc-sa/3.0/fr/88x31.png" /></a></div>
+
+<div id="validation">
+<a href="http://validator.w3.org/check?uri=referer"><img src="http://www.w3.org/Icons/valid-xhtml10" alt="Valid XHTML 1.0 Strict" height="31" width="88" /></a>
+
+</div>
+</body></html>

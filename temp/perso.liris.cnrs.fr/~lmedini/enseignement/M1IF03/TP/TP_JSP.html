@@ -1,0 +1,281 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="application/xml+xhtml; charset=utf-8" />
+<meta http-equiv="Content-Language" content="fr" />
+<meta http-equiv="Author" content="Lionel Médini" />
+<link rel="stylesheet" type="text/css" media="screen" href="https://perso.liris.cnrs.fr/~lmedini/enseignement/medini.css" />
+<link rel="stylesheet" type="text/css" media="print" href="https://perso.liris.cnrs.fr/~lmedini/enseignement/medini-print.css" />
+<script type="text/javascript" src="https://perso.liris.cnrs.fr/~lmedini/js/menu.js"></script>
+<title>M1IF03 - TP2 : servlets / JSP</title>
+</head>
+<body>
+<div id="principale">
+<h1>TP 2 : technologies c&ocirc;t&eacute; serveur (servlets/JSP)</h1>
+<h2>Objectifs p&eacute;dagogiques</h2>
+<ul>
+<li>Se familiariser avec la programmation c&ocirc;t&eacute; serveur en Java : servlets et JSP</li>
+<li>Concevoir une application Web compl&egrave;te et fonctionnelle comportant plusieurs couches distinctes</li>
+<li>G&eacute;rer les sessions</li>
+<li>Manipuler les headers HTTP</li>
+</ul>
+
+<h2 id="rendu">Date de rendu</h2>
+<p><strong>Ce TP est à réaliser et à pusher dans la forge pour le 4 novembre 2018 à 23h59.</strong></p>
+<p>Il vous servira de base pour les TPs suivants.</p>
+
+<h2 id="outils">Outils</h2>
+<ul>
+<li><strong>Logiciels install&eacute;s sur les machines de TP :</strong> Navigateurs Web, EDI NetBeans  / Eclipse / IntelliJ</li>
+<li><strong>Logiciels libres que vous pouvez installer chez vous :</strong> idem.</li>
+<li><strong>Serveur (Apache) + moteur de servlets Tomcat</strong> : vous trouverez la <a href="https://tomcat.apache.org/whichversion.html">version 9</a> de Tomcat en ligne <a href="https://tomcat.apache.org/download-90.cgi">ici</a> ou en local dans le répertoire "enseignement/Installs" de ma page. &Agrave; décompresser dans le répertoire temporaire des machines de TP.<br/>
+<strong>Attention</strong>&nbsp;: pour installer Tomcat à partir de ce zip, vous devrez modifier la configuration (répertoire <span class="code">conf</span> de votre installation) pour :
+<ul>
+<li><a href="http://tomcat.apache.org/tomcat-9.0-doc/manager-howto.html#Configuring_Manager_Application_Access">ajouter un utilisateur manager</a> (etudiant/etudiant) dans le fichier <span class="code">tomcat-users.xml</span>, que votre IDE utilisera pour contrôler le serveur.</li>
+<li>Modifier l'encodage par défaut (ISO-8859-1) utilisé pour décoder les paramètres des requêtes :
+<ul><li>dans le fichier <span class="code">Server.xml</span>, rajouter à l'élément <span class="code">Connector</span> les attributs <span class="code">URIEncoding="UTF-8"</span> et <span class="code">useBodyEncodingForURI="true"</span> (voir doc <a href="http://tomcat.apache.org/tomcat-9.0-doc/config/http.html#Common_Attributes">ici</a>), et</li>
+<li>dans le fichier <span class="code">web.xml</span> décommenter les deux blocs qui spécifient le <span class="code">setCharacterEncodingFilter</span> (voir doc <a href="https://tomcat.apache.org/tomcat-9.0-doc/config/filter.html">là</a>).</li>
+</ul></li>
+</ul></li>
+</ul>
+
+<h2 id="description">Description de l'application</h2>
+<p>Il s'agit d'une application Web de gestion de fils de discussions (chat) simple qui fonctionnera derrière un serveur Apache et un moteur de servlets et de JSP (inclus dans Tomcat).</p>
+
+<!--p>Pour vous faire gagner du temps, nous vous fournissons des exemples de code HTML que vous pouvez (mais n'êtes pas obligés de) réutiliser et adapter au fur et à mesure de l'avancement de votre projet.</p-->
+
+<h3 id="fonctionnalites">Fonctionnalités</h3>
+<p>Les t&acirc;ches &agrave; r&eacute;aliser sont les suivantes : </p>
+<ul>
+<li>Permettre &agrave; chaque utilisateur de saisir un pseudonyme (pas de gestion des mots de passe).</li>
+<li>Permettre &agrave; chaque utilisateur de saisir un message textuel.</li>
+<li>M&eacute;moriser les interventions de tous les utilisateurs, pr&eacute;c&eacute;d&eacute;es de leurs pseudos.</li>
+<li>Les afficher aux utilisateurs.</li>
+<li>Se déconnecter.</li>
+</ul>
+
+<h3 id="archi">Architecture de l'interface et des composants de
+l'application</h3>
+<h4>Accueil</h4>
+<p>La page d&#8217;accueil (<span class="code">index.html</span>, voir
+figure
+ci-dessous) contient un formulaire demandant un pseudo &agrave;
+l&#8217;utilisateur. Le pseudo est saisi dans un champ texte, qui est
+envoy&eacute; par la m&eacute;thode POST &agrave; une
+servlet, appel&eacute;e <span class="code">Init</span>.<br />
+<br />
+<img alt="page d'accueil du chat" src="interface_chat1.png" style="max-width: 700px;" class="center"/></p>
+<h4>Initialisation</h4>
+<p>La servlet <span class="code">Init</span> effectue un traitement
+de la requ&ecirc;te (voir plus loin), et redirige l&#8217;utilisateur sur une page HTML appel&eacute;e <span class="code">interface.html</span>.</p>
+<h4>Chat</h4>
+<p>Cette interface est affichée pendant le fonctionnement "normal" de l'application (voir figure ci-dessous). Elle est reponsable des fonctionnalit&eacute;s suivantes :<br />
+</p>
+<ul>
+<li>Affichage des messages : cette page statique délègue à une page JSP nommée <span class="code">Messages.jsp</span> la gestion et l'affichage des messages envoyés par les différents utilisateurs (voir plus loin) ; pour cela, elle contient un élément <span class="code">iframe</span> qui affiche Messages.jsp et est placé en haut de l'écran, sur toute la largeur de la fenêtre<br/>
+<strong>Attention</strong>, pour pouvoir adresser cette page JSP depuis un autre élément de la page interface.html, il faut lui donner un nom (attribut <span class="code">name</span>) ; vous l'appelerez "messages"</li>
+<li>Saisie et envoi de nouveaux messages : interface.html contient un formulaire basique qui permet la saisie d'un message et son envoi par POST à la JSP "messages" ; cela provoque la m&eacute;morisation du nouveau message et l'actualisation de l'affichage de ceux-ci</li>
+<li>D&eacute;connexion : quand l'utilisateur veut quitter l'application, il clique sur un lien le renvoyant vers une servlet nommée <span class="code">Deco</span></li>
+</ul>
+
+<p><img alt="page d'accueil du chat" src="interface_chat2.png" style="max-width: 700px;" class="center" /></p>
+
+<div><span style="font-weight: bold;">Remarques :</span>
+<ul>
+<li>affichage des messages : la totalit&eacute; des messages &eacute;chang&eacute;s sont affich&eacute;s, avec leurs auteurs ; pour permettre le chargement des nouveaux messages sans renvoi de donn&eacute;es de la part de l'utilisateur, cet affichage est actualis&eacute; toutes les 5 secondes,</li>
+<li>On ne se pr&eacute;occupe pas ici de la sauvegarde des messages ; leur dur&eacute;e de vie est la m&ecirc;me que celle de l'application déployée sur le serveur.</li>
+</ul>
+</div>
+
+<h3 id="deco">Deconnexion</h3>
+<p>La servlet <span class="code">Deco</span> est chargée de déconnecter l'utilisateur (voir plus bas) et de le renvoyer vers la page d'accueil.</p>
+
+<h2 id="projet" class="questionStart question">Mise en place du projet</h2>
+
+<p>Les différentes opérations ci-dessous nous permettront de récupérer correctement votre TP et les informations nécessaires à votre notation. Merci de veiller à ce qu'elles soient correctement réalisées, sans quoi vous risquez soit d'être sanctionnés, soit que votre projet ne soit pas corrigé.</p>
+
+<ul>
+<li>Projet forge : Créez un nouveau projet sur la forge, et <strong>remplissez dans Tomuss la case indiquée "URL_Projet_forge_TP2_(complète)" avec l'URL de base de votre projet</strong></li>
+<li>Rapporteurs : <strong>rajoutez vos enseignants (Lionel Médini, Romuald Thion) comme reporters de votre projet forge.</strong></li>
+<li>Tags de versions : durant ce TP, vous aurez plusieurs versions de la même application à développer. Vous "pousserez" toutes ces versions dans la branche "master" de votre projet forge. &Agrave; la fin de chaque partie du TP, <strong>taggez le dernier commit à l'aide du numéro de cette partie</strong> (ex : "TP2 - 3.1").</li>
+<li>Readme : au fur et à mesure de ce TP, <strong>indiquez dans le fichier README.md les différents choix d'implémentation que vous aurez faits</strong>, pour les questions où vous avez plusieurs alternatives. Vous y mentionnerez également <strong>les détails que vous jugez utiles à connaître pour le correcteur</strong> (bibliothèques supplémentaires utilisées, dernière question traitée, etc.).</li>
+</ul>
+
+<h3 id="config_mvn">Configuration du projet Maven</h3>
+<p>Dans ce TP, vous allez travailler dans un projet <a href="https://maven.apache.org/archetypes/maven-archetype-webapp/">Maven Webapp</a>. Pour créer votre projet, vous avez plusieurs possibilités :</p>
+<ul>
+<li>Dans votre IDE, cr&eacute;ez un nouveau projet de type "Maven" -&gt; "Web Application", que vous nommerez "Chat". Assurez-vous que le serveur utilis&eacute; est bien Tomcat version 8.0 ou supérieure et que la version de Java EE est bien au moins JEE5.&nbsp;Lorsque votre IDE vous cr&eacute;e le projet, il vous cr&eacute;e automatiquement une page d'accueil nomm&eacute;e index.jsp. Supprimez cette page, dont vous n'aurez pas besoin.</li>
+<li>Avec Maven : ouvrez une ligne de commande et utilisez la commande Maven suivante :
+<div class="code">mvn archetype:generate -DarchetypeGroupId=org.apache.maven.archetypes -DarchetypeArtifactId=maven-archetype-webapp -DarchetypeVersion=1.3</div></li>
+</ul>
+<p><strong>Attention</strong> : Maven ne vous crée pas tout seul le répertoire <span class="code">src/main/java</span>. &Agrave; vous de le créer car c'est dans ce répertoire que vous allez devoir mettre vos fichiers Java. Si votre IDE indique <span class="code">src/main/resources</span> dans la configuration des fichiers sources de votre projet, supprimez ce répertoire de la configuration.</p>
+<p>Bien entendu, dans vos classes Java, n'oubliez pas de déclarer le package dans lequel elles sont situées.</p>
+<p>Ensuite, vous devrez ajouter dans votre projet une dépendance sur l'API servlet et sur la bibliothèque JSTL de tags JSP. Pour cela, rajoutez le code suivant dans votre pom.xml :</p>
+<div><pre class="code">    &lt;dependency&gt;
+      &lt;groupId&gt;javax&lt;/groupId&gt;
+      &lt;artifactId&gt;javaee-web-api&lt;/artifactId&gt;
+      &lt;version&gt;8.0&lt;/version&gt;
+      &lt;scope&gt;provided&lt;/scope&gt;
+    &lt;/dependency&gt;
+    &lt;dependency&gt;
+      &lt;groupId&gt;javax.servlet&lt;/groupId&gt;
+      &lt;artifactId&gt;jstl&lt;/artifactId&gt;
+      &lt;version&gt;1.2&lt;/version&gt;
+    &lt;/dependency&gt;</pre></div>
+
+<h3 id="config_el">Configuration pour l'utilisation d'Expression Language en JSP</h3>
+<p>Si vous voulez utiliser EL dans vos JSP, il faut que votre web.xml corresponde à l'API Servlet 2.4 ou supérieure. Exemple de code de l'élément racine :</p>
+<div><pre class="code">&lt;web-app
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns="http://java.sun.com/xml/ns/javaee"
+    xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
+    version="3.0"&gt;</pre></div>
+
+<h3 id="tomcat-plugin">Configuration du plugin Tomcat7 de Maven</h3>
+<p>Pour vous faire gagner du temps dans vos déploiements, vous pouvez ajouter le plugin <a href="http://tomcat.apache.org/maven-plugin-2.0/tomcat7-maven-plugin/">Tomcat Maven Plugin</a>, en utilisant <a href="https://www.baeldung.com/tomcat-deploy-war">cette procédure d'installation</a>.</p>
+
+<h2 id="conception" class="question">Conception basique de l'application</h2>
+<h3>Pages statiques</h3>
+<p>Pour vous faire gagner du temps, les deux pages statiques <span class="code">index.html</span> et <span class="code">interface.html</span> vous sont données <a href="https://perso.liris.cnrs.fr/~lmedini/enseignement/M1IF03/Ressources/TP2">ici</a>.</p>
+
+<h3>Initialisation</h3>
+<p>Cr&eacute;ez ensuite une nouvelle servlet <span class="code">Init</span>. Cette servlet r&eacute;pondra aux requ&ecirc;tes en GET ou en POST, et effectuera les traitements suivants :</p>
+<ul>
+<li>Pour les appels en GET : redirection sur index.html</li>
+<li>Pour les appels en POST :
+<ol>
+<li>cr&eacute;ation / r&eacute;cup&eacute;ration de la session de l'utilisateur</li>
+<li>r&eacute;cup&eacute;ration du param&egrave;tre de la requ&ecirc;te contenant le pseudo saisi par l'utilisateur</li>
+<li>cr&eacute;ation d'un attribut de la session ayant pour valeur ce pseudo</li>
+<li>redirection vers interface.html</li>
+</ol>
+En cas d'erreur dans l'une des &eacute;tapes de ce processus, l'utilisateur sera redirig&eacute; vers <span class="code">index.html</span>.</li>
+</ul>
+
+<h3>Interface de gestion des messages</h3>
+<p>La page&nbsp;<span class="code">Messages.jsp</span> permet de g&eacute;rer les messages. Pour cela, elle poss&egrave;de une variable globale de type List&lt;Message&gt; (&agrave; vous de cr&eacute;er la classe Message). <span class="code">Messages.jsp</span> a deux fonctions distinctes :</p>
+<ol>
+<li><span style="font-weight: bold;">R&eacute;ception et m&eacute;morisation des messages envoy&eacute;s par POST :</span> &agrave; la r&eacute;ception d'une requ&ecirc;te POST, la page r&eacute;cup&egrave;re le texte du message dans le param&egrave;tre de la requ&ecirc;te <span style="font-style: italic;">ad hoc</span>, ainsi que le nom de son auteur dans l'attribut de session stock&eacute; par Init. Elle cr&eacute;e alors un nouveau message, qu'elle place en queue de liste.</li>
+<li><span style="font-weight: bold;">Affichage des messages :</span> &agrave; la r&eacute;ception d'une requ&ecirc;te (GET ou POST), la page parcourt la liste et affiche tous les messages avec la mise en forme qui vous pla&icirc;ra. En l'absence d'envoi de donn&eacute;es de la part du client, cet affichage s'actualisera toutes les 5 secondes.</li>
+</ol>
+<p style="font-weight: bold;">Indications :</p>
+<ul>
+<li>pour l'actualisation automatique de la page, vous utiliserez l'en-t&ecirc;te HTTP "Refresh"</li>
+<li>l'envoi d'un formulaire vers un iframe se fait en utilisant l'attribut <span style="font-family: Courier New;">target</span>,</li>
+<li>bien entendu, faites en sorte que vos documents (statiques et g&eacute;n&eacute;r&eacute;s) soient en XHTML strict (sauf pour celui qui d&eacute;finit les iframes) et que des feuilles de style CSS leur soient associ&eacute;es,</li>
+</ul>
+
+<h3>Ajout de salons</h3>
+<p>Vous allez maintenant modifier votre application pour qu'elle prenne en charge plusieurs "salons de discussion".</p>
+<ul>
+<li>dans le formulaire de connexion (index.html), ajoutez un champ permettant d'indiquer un nom de salon</li>
+<li>pour l'instant, placez le nom du salon dans un attribut de session</li>
+<li>faites en sorte que Messages.jsp puisse gérer plusieurs listes de messages, correspondant aux différents salons (déclenchez la création d'une liste à chaque nouveau nom de salon)</li>
+</ul>
+
+<h3>Déconnexion</h3>
+<p>Créez une servlet permettant de gérer la déconnexion de l'utilisateur en supprimant ses attributs de session et faites pointer le lien de la page de interface.html dessus.</p>
+
+<p><span class="bleu">&Agrave; ce stade, vous avez r&eacute;alis&eacute; une application de chat basique, mais fonctionnelle.</span></p>
+ 
+<h2 id="refactoring" class="question">Refactoring de votre application</h2>
+<p>Une fois la session de chat lanc&eacute;e, la totalit&eacute; de la logique applicative est g&eacute;r&eacute;e par <span class="code">Messages.jsp</span>, ce qui n'est pas tr&egrave;s satisfaisant.</p>
+<h3>Pattern MVC</h3>
+<p>Refactorez votre application pour appliquer un pattern MVC. Vous avez le choix entre 2 solutions :</p>
+<h4>MVC Pull-based</h4>
+<p>Dans cette solution :</p>
+<ul>
+<li>Le code du contrôleur sera dans une servlet. Le contrôleur se contentera d'aiguiller les requêtes vers les JSP vues.</li>
+<li>Le code de la vue sera dans des JSP. Chaque JSP est responsable d'interroger les objets du modèle pour se mettre à jour.</li>
+<li>Le code du modèle sera dans des JavaBeans. Les scopes de ces beans seront appropriés à la durée de vie des informations qu'ils contiennent.</li>
+</ul>
+<p>Aide : <strong>Mise en place des JavaBeans</strong></p>
+<p>Cr&eacute;er une classe&nbsp;<span class="code">GestionMessages</span> qui contiendra le modèle de votre application et qui possèdera les caractéristiques suivantes :</p>
+<ul>
+<li>un constructeur sans paramètre</li>
+<li>une <span class="code">Map&lt;String, ArrayList&lt;Message&gt;&gt;</span> qui sera stockée dans une variable statique, pour que toutes les instances de la classe puissent partager les messages de tous les salons</li>
+<li>un accesseur permettant à la JSP de lui injecter le nom du salon, pour qu'il ne manipule en interne que la liste des messages de ce salon</li>
+<li>les accesseurs standard n&eacute;cessaires &agrave; l'ajout d'un message et à la r&eacute;cup&eacute;ration de l'ensemble des messages d'un salon</li>
+<li>un accesseur permettant de r&eacute;cup&eacute;rer le nombre total de messages échangés dans un salon</li>
+</ul>
+<p>Vous utiliserez cette classe en tant que JavaBean dans&nbsp;<span class="code">Messages.jsp</span>, &agrave; l'aide de &lt;jsp:useBean&gt;. &Agrave; vous de déterminer le scope de ce bean. Testez.</p>
+
+<h4>MVC push-based</h4>
+<ul>
+<li>Le code du contrôleur sera dans une servlet. Le contrôleur est responsable de déclencher les changements d'états du modèle, puis de récupérer les données et d'aiguiller les requêtes vers les JSP vues.</li>
+<li>Le code de la vue sera dans des JSP. Chaque JSP recevra en attribut de requête les données du modèle transmises par le contrôleur.</li>
+<li>Le code du modèle sera dans des classes Java connues du contrôleur.</li>
+</ul>
+
+<!--h4>Utilisation d'attribut de requête</h4>
+<p>Maintenant que vous avez un contrôleur, supprimez l'attribut de session mis en place pour la transmission du nom du salon et faites en sorte que celui-ci apparaisse dans l'URL de la requête et qu'il soit traité au niveau du contrôleur de l'application.</p>
+<ul>
+<li>Passez le nom du salon en attribut de requête</li>
+<li>Modifiez le scope du bean en conséquence</li>
+</ul-->
+
+<h3>Inclusion/transfert de requ&ecirc;tes</h3>
+<p>Vous allez maintenant cr&eacute;er deux nouvelles pages JSP :</p>
+<ul>
+<li><span class="code">Stockage.jsp</span>, qui ne sera appel&eacute;e que pour des requ&ecirc;tes POST, et qui r&eacute;alisera la partie "R&eacute;ception et m&eacute;morisation des messages envoy&eacute;s par POST",</li>
+<li><span class="code">Affichage.jsp</span>, qui r&eacute;alisera la partie "Affichage des messages".</li>
+</ul>
+<p>D&egrave;s lors, <span class="code">Messages.jsp</span> peut se borner &agrave; tester la m&eacute;thode utilis&eacute;e et &agrave; utiliser les actions &lt;jsp:forward&gt; et &lt;jsp:include&gt;. &Agrave; vous de d&eacute;terminer quelle st la JSP incluse et quelle est celle &agrave; qui la requ&ecirc;te est forward&eacute;e...&nbsp;</p>
+
+<h3>Pattern chaîne de responsabilité</h3>
+<p>Remplacez la servlet Init par un Filter, qui vérifie, quelle que soit l'URL de la page appelée, que l'utilisateur est connecté (qu'il possède un login), avant de lui permettre d'accéder à l'application. Si ce n'est pas le cas, il sera redirigé vers le formulaire de connexion. Pour cela :</p>
+<ul>
+<li>Créez une classe qui implémente l'interface <span class="code">javax.servlet.Filter</span></li>
+<li>Reprenez (et adaptez) le contenu de la méthode de service de la servlet Init dans celle de votre filtre :
+<ul>
+<li>Si l'utilisateur possède un pseudo : poursuivez le traitement à l'aide de la méthode <span class="code">chain.doFilter()</span></li>
+<li>Sinon : si la requête provient du formulaire de connexion, traitez-la comme le faisait la servlet Init</li>
+<li>Sinon : renvoyez un code de redirection dans la réponse pour que l'utilisateur aboutisse au formulaire de connexion</li>
+</ul></li>
+<li>Déclarez ce filtre dans le fichier de configuration de l'application</li>
+</ul>
+
+<p><strong>Attention</strong> : le filtre ne doit pas bloquer l'accès au formulaire de login. Vous configurerez votre application pour qu'il soit appliqué à toutes les URL sauf celle de ce formulaire.</p>
+
+<p class="bleu">&Agrave; ce stade, vous avez refactoré votre application en utilisant certains patterns vus en Génie Logiciel. Vous avez rendu le code plus lisible, en utilisant les différents éléments de l'API Java EE Web à bon escient.</p>
+
+<h2 id="amelioration" class="question">Am&eacute;lioration de l'application</h2>
+<p>L'&eacute;tat actuel de votre application est le suivant : toutes les 5 secondes, chaque client interroge le serveur, qui parcourt alors toute la liste de messages et re-g&eacute;n&egrave;re dynamiquement un nouvel affichage contenant la totalit&eacute; des messages enregistr&eacute;s, qui sera renvoy&eacute; &agrave; chaque client <span style="font-style: italic;">via</span> le r&eacute;seau. Si le nombre d'utilisateurs est grand et/ou s'il y a de nombreux messages enregistr&eacute;s dans la base, ce fonctionnement peut vite repr&eacute;senter une charge de travail importante pour le serveur, ainsi qu'une consommation inutile de bande passante r&eacute;seau.</p>
+<p>L'objectif de cette partie est d'am&eacute;liorer le processus de r&eacute;cup&eacute;ration et d'affichage des messages &eacute;chang&eacute;s par les diff&eacute;rents utilisateurs. Pour cela, vous allez permettre &agrave; votre application de d&eacute;terminer si elle doit recalculer l'affichage des messages pour un client, ou s'il n'y a pas lieu de le faire. Deux possibilit&eacute;s sont &agrave; votre disposition.</p>
+
+<h3>Utilisation des en-t&ecirc;tes HTTP</h3>
+<p>La plupart des clients renvoient au serveur un en-t&ecirc;te HTTP If-Modified-Since, indiquant la date de leur dernier chargement d'une page. Si cette date est post&eacute;rieure &agrave; celle du dernier POST re&ccedil;u, aucun nouveau message n'est disponible. Plut&ocirc;t que de renvoyer une r&eacute;ponse HTTP contenant une page compl&egrave;te, il suffit de renvoyer juste un en-t&ecirc;te HTTP, avec le code de statut 304 indiquant au client que la page n'a pas &eacute;t&eacute; modifi&eacute;e.</p>
+
+<p>Pour cela :</p>
+<ol>
+<li>v&eacute;rifiez que votre serveur&nbsp;envoie bien au client un en-t&ecirc;te&nbsp;Last-Modified &agrave; la g&eacute;n&eacute;ration de la r&eacute;ponse (sur les versions récentes de Tomcat, le header est positionné par défaut sur les pages HTML et pas sur les JSP) ; sinon, rajoutez-le dans&nbsp;<span class="code">Affichage.jsp</span></li>
+<li>v&eacute;rifiez que votre client vous renvoie bien cette valeur dans un en-t&ecirc;te If-Modified-Since lors de la requ&ecirc;te d'actualisation de la page&nbsp;<span class="code">Messages.jsp</span></li>
+<li>rajoutez un attribut permettant de stocker la valeur de derni&egrave;re modification de la liste des messages dans le contexte de l'application et faites en sorte que <span class="code">Stockage.jsp</span> actualise sa valeur &agrave; chaque appel </li>
+<li>lors de l'appel en GET de <span class="code">Messages.jsp</span>, comparez la valeur de l'en-t&ecirc;te If-Modified-Since re&ccedil;u avec celle de l'attribut du contexte applicatif et r&eacute;agissez en cons&eacute;quence (g&eacute;n&eacute;ration de la page ou code de statut 304).</li>
+</ol>
+
+<p>Il est possible que votre navigateur ne prenne plus en compte le header Refresh après réception d'un code de retour 304. Ne passez pas trop de temps à essayer de régler ce problème, qui ne se posera plus dans les versions ultérieures.</p>
+
+<h3>Utilisation des cookies</h3>
+
+<p>Si le num&eacute;ro du dernier message m&eacute;moris&eacute; (<span style="font-style: italic;">i.e.</span> le nombre total de messages) est &eacute;gal &agrave; celui du dernier message envoy&eacute; &agrave; un client (<span style="font-style: italic;">i.e.</span> le nombre total de messages au moment o&ugrave; le serveur lui a servi la r&eacute;ponse), cela signifie qu'aucun message n'est arriv&eacute; depuis la derni&egrave;re requ&ecirc;te du client. Il est donc inutile de lui renvoyer la page.</p>
+
+<ol>
+<li>rajoutez / updatez un cookie chez votre client indiquant le num&eacute;ro du dernier message obtenu lors de l'envoi d'une r&eacute;ponse par&nbsp;<span class="code">Affichage.jsp</span></li>
+<li>lors de la r&eacute;ception d'une requ&ecirc;te GET par <span class="code">Messages.jsp</span>, testez l'existence de ce cookie et comparez sa valeur au nombre total de messages m&eacute;moris&eacute;s</li>
+<li>r&eacute;agissez en cons&eacute;quence (voir plus haut).</li>
+</ol>
+
+<div style="font-weight: bold;">Indication :</div>
+<p>Utilisez le getter de <span class="code">GestionMessages</span> permettant de r&eacute;cup&eacute;rer le nombre total de messages.</p>
+
+<p class="bleu">Vous avez maintenant commenc&eacute; l'optimisation de votre application en termes de charge serveur et de bande passante r&eacute;seau. Ce travail sera poursuivi lors des TPs REST et AJAX.</p>
+</div>
+<div id="license"><a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/fr/"><img alt="Licence Creative Commons" style="border-width:0" src="http://i.creativecommons.org/l/by-nc-sa/3.0/fr/88x31.png" /></a></div>
+
+<div id="validation">
+<a href="http://validator.w3.org/check?uri=referer"><img src="http://www.w3.org/Icons/valid-xhtml10" alt="Valid XHTML 1.0 Strict" style="height: 31px; width: 88px" /></a>
+</div>
+</body></html>

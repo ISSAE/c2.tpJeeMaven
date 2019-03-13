@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html xml:lang="fr" lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta http-equiv="Content-Language" content="fr" />
+<meta http-equiv="Author" content="Lionel Médini" />
+<link rel="stylesheet" type="text/css" media="screen" href="https://liris.cnrs.fr/lionel.medini/enseignement/medini.css" />
+<link rel="stylesheet" type="text/css" media="print" href="https://liris.cnrs.fr/lionel.medini/enseignement/medini-print.css" />
+<script type="text/javascript" src="https://perso.liris.cnrs.fr/~lmedini/js/menu.js"></script>
+<title>M1IF03 - TP3 : Spring Web MVC</title>
+</head>
+<body>
+<div id="principale">
+<p style="font-weight: bold; text-align:center;">
+	Universit&eacute; Claude Bernard Lyon 1 &ndash; M1 informatique &ndash; M1IF03</p>
+<h1>TP M1IF03 - Spring Web MVC</h1>
+<h2 id="objectifs">Objectifs p&eacute;dagogiques</h2>
+<p>Découvrir le framework Spring et en particulier le projet Spring MVC.</p>
+
+<h2 id="description">Description de l'application</h2>
+
+<p>Dans cette partie, vous allez compléter votre application de chat avec un "back office" qui permettra aux utilisateurs d'effectuer directement des opérations simples sur les ressources du chat (utilisateurs, salons, messages).</p>
+
+<h2 id="init">Premier projet Spring Web MVC</h2>
+<p>Dans cette partie, vous vous inspirerez des <a href="../CM/3_Outils_serveur.pdf">transparents du cours</a> et de la <a href="http://docs.spring.io/spring/docs/current/spring-framework-reference/html/mvc.html">doc de Spring Web MVC</a>.</p>
+
+<p>Le plus simlpe est de repartir de la dernière version de votre projet Web Maven du <a href="http://liris.cnrs.fr/lionel.medini/enseignement/M1IF03/TP/TP_JSP.html">TP précédent</a> (mais vous pouvez aussi recréer un projet Maven Web vide, avec les bonnes dépendances).</p>
+
+<h3>Configuration</h3>
+<ol>
+	<li>Ajoutez-y les dépendances de <a href="Spring/pom.xml">ce fichier pom.xml</a>.</li>
+	<li>Dans le dossier <span class="code">src/main/webapp/WEB-INF</span>, créez (s'il n'existe pas) un fichier de configuration <span class="code">web.xml</span> ou modifiez-le comme indiqué en cours (slide 44)</li>
+    <li>Dans ce même dossier, collez <a href="Spring/beans.xml">ce fichier</a> et renommez-le en &lt;leNomDeVotreDispatcherServlet&gt;-servlet.xml</li>
+	<li>Créez un sous-dossier "jsp" dans WEB-INF. Indiquez dans le fichier de configuration Spring que le view resolving sera réalisé par la classe <span class="code">org.springframework.web.servlet.view.UrlBasedViewResolver</span>, et que les <span class="code">View</span> seront implémentées sous forme de JSP et devront être recherchées dans ce dossier (cf. slide 47 du cours)</li>
+</ol>
+
+<h3>Contrôleur et vue</h3>
+<ol>
+	<li>Créez un package <span class="code">fr.univlyon1.mif03.tpspring.controller</span> et collez-y  la classe <a href="Spring/HelloController">HelloController</a>. Annotez-la à l'aide de l'annotation <span class="code">@Controller</span> et faites en sorte que ce contrôleur réponde aux requêtes sur "/hello".</li>
+	<li>Créez une JSP qui réalise la vue correspondante.</li>
+	<li>Déployez et testez.</li>
+</ol>
+
+<h3>Bean Spring</h3>
+<ol>
+	<li>Créez un package <span class="code">fr.univlyon1.mif03.tpspring.beans</span> et collez-y le bean <a href="Spring/HelloBean.java">HelloBean</a>.</li>
+	<li>Faites en sorte que votre contrôleur appelle le bean et renvoie à la JSP un objet <span class="code">ModelAndView</span> en fonction d'un paramètre passé dans la requête.</li>
+	<li>Ajoutez la configuration correspondante pour votre bean :
+		<ul>
+			<li>Soit en XML : <span class="code">&lt;bean id="helloBean" class="fr.univlyon1.mif03.tpspring.beans.HelloBean">&lt;/bean></span></li>
+			<li>Soit avec l'annotation <span class="code">@bean</span>
+		</ul>
+	</li>
+	<li>Testez à nouveau.</li>
+</ol>
+
+<p><strong>Indications :</strong></p>
+<p>Vous pouvez vous inspirer de <a href="http://spring.io/guides/gs/serving-web-content/">ce tutoriel</a>, mais <strong>arrêtez-vous à la fin de la partie "Create a web controller"</strong> (rappel : Spring Boot est hors du scope de ce TP ; vous ne devez donc pas l'utiliser).</p>
+
+<p>Remarque : si vous devez modifier la version de Spring utilisée dans le tutoriel pour qu'elle soit compatible avec la version des dépendances disponible dans le repository Maven, vous pouvez chercher ces dépendances sur <a href="http://search.maven.org/">http://search.maven.org/</a>.</p>
+
+<p>Aide : voici un <a href="Spring/testspring.zip">corrigé rapide de cette partie</a>.</p>
+
+<h2 id="chat">Utilisation de Spring avec votre projet chat</h2>
+
+<ol>
+<li>Reprenez votre projet Maven de chat, et "mappez" vers une URL spécifique (par exemple : "/back-office"), le contrôleur Spring (laissez les autres types d'URLs mappées vers votre chat)</li>
+<li>Utilisez Spring Web MVC pour bâtir l'architecture de votre back-office. Dans un premier temps, on doit pouvoir envoyer les requêtes suivantes au back office :
+<ul>
+<li>GET sur une URL comportant le nom d'un salon pour voir la liste des messages dans ce salon</li>
+<li>POST sur une URL particulière (par exemple "users") pour rajouter un utilisateur qui aura le droit d'utiliser le chat ; modifiez le projet chat en conséquence, pour que seuls les utilisateurs dont les pseudos figurent dans cette liste aient les droits correspondants. Merci de fournir le formulaire permettant de faire le post pour ajouter un utilisateur.</li>
+<li>GET sur une URL comportant le nom d'un salon et le numéro d'un message pour voir le contenu de ce message</li>
+</ul>
+</li>
+</ol>
+
+<h2 id="rendu">Instructions de rendu</h2>
+
+<p>Ce TP est à rendre avec le précédent et le suivant. Il faut donc le pusher dans votre repository sur la forge. Vous taggerez la dernière révision concernant ce TP ainsi : "TP-Spring".</p>
+
+<p><strong>Vous aurez besoin d'avoir terminé ce TP pour pouvoir faire le suivant.</strong></p>
+</div>
+<div id="license"><a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/fr/"><img alt="Licence Creative Commons" style="border-width:0" src="http://i.creativecommons.org/l/by-nc-sa/3.0/fr/88x31.png" /></a></div>
+<div id="validation">
+	<a href="http://validator.w3.org/check?uri=referer"><img src="http://www.w3.org/Icons/valid-xhtml10" alt="Valid XHTML 1.0 Strict" style="height: 31px; width: 88px" /></a>
+</div>
+</body>
+</html>

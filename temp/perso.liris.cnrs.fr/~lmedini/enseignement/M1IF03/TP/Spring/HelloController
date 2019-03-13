@@ -1,0 +1,8 @@
+package fr.univlyon1.mif03.tpspring.controller;
+
+public class HelloController {
+
+    public String hello() {
+        return "hello";
+    }
+}

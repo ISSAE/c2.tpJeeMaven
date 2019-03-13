@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head>
+<meta http-equiv="Content-Type" content="application/xml+xhtml; charset=utf-8" />
+<meta http-equiv="Content-Language" content="fr" />
+<meta name="description" content="TP HTTP MIF13 2014"/>
+<meta name="keywords" content="nginx,http,mif13,2014"/>
+<meta name="author" content="Lionel Médini"/>
+<link rel="stylesheet" type="text/css" media="screen" href="https://perso.liris.cnrs.fr/~lmedini/enseignement/medini.css" />
+<link rel="stylesheet" type="text/css" media="print" href="https://perso.liris.cnrs.fr/~lmedini/enseignement/medini-print.css" />
+
+<title>M1IF03 - TP serveur</title>
+</head><body>
+<div id="principale">
+<h1 id="main_title">TP 1 : technologies côté serveur</h1>
+<h2 id="objectifs">Objectifs pédagogiques du TP</h2>
+<ul>
+<li>Comprendre le fonctionnement du protocole HTTP</li>
+<li>Comprendre le fonctionnement d'un serveur Web</li>
+<li>Se familiariser avec la configuration d'nginx</li>
+<li>Savoir créer et configurer un site Web</li>
+</ul>
+<h2 id="outils">Outils</h2>
+<ul>
+<li><span style="font-weight: bold;">Serveur HTTP&nbsp;:</span> nginx</li>
+<li><span style="font-weight: bold;">Navigateurs&nbsp;</span> Mozilla Firefox (installé par défaut sur Ubuntu), autres navigateurs (Google Chromium) que vous installerez par vous-mêmes</li>
+<li><span style="font-weight: bold;">Ressources :</span> <a href="http://nginx.org/en/docs/">docs en ligne d'nginx</a> et en particulier <a href="http://nginx.org/en/docs/beginners_guide.html">aide au démarrage</a> et <a href="http://nginx.com/resources/admin-guide/web-server/">doc du serveur Web</a>.</li>
+<li><span style="font-weight: bold;">Tutoriels :</span> voir partie "Liens utiles" de la page d'accueil du cours</li>
+<li><span style="font-weight: bold;">Connexion aux VMs&nbsp;</span> les machines sont accessibles en SSH (sous Windows, utiliser <a href="http://mobaxterm.mobatek.net/">MobaXterm</a> ou <a href="http://www.putty.org/">Putty</a>)</li>
+<li><span style="font-weight: bold;">Autres outils&nbsp;</span> éditeurs de texte, autres commandes Linux installées sur les machines</li>
+</ul>
+
+<h2 id="evaluation">Évaluation</h2>
+<!--p>Cet énoncé correspond à <strong>deux questionnaires</strong> Claroline (module "<a href="https://clarolineconnect.univ-lyon1.fr/workspaces/127383/open/tool/resource_manager">Rendu M1IF03</a>") auxquels vous devez répondre avant la fin du TP. Ils sont nommés "Réponses TP nginx" 1 et 2 est ouvert durant le temps de déroulement du TP. La note de ce TP sera calculée en fonction de vos réponses à ce questionnaire.</p-->
+
+<p>Vous répondrez au questionnaire Tomuss correspondant à votre groupe et reprenant les questions numérotées et <strong>en gras</strong> de cet énoncé : https://tomuss.univ-lyon1.fr/2018/Automne/TP1-M1IF03-grpB ou -grpC ou -grpD. La note de ce TP sera calculée en fonction de vos réponses à ce questionnaire.</p>
+
+<p><strong><span style="color: red;">Attention :</span> pour les réponses avec plusieurs lignes (par exemple du code), merci de rajouter le caratère '§' (paragraphe) à la fin de chaque ligne.</strong></p>
+
+
+<h2 id="preambule">Préambule</h2>
+<p style="font-size: 150%;"><strong>Attention : vous devez être soit sur eduroam, soit en VPN (soit sur les machines de TP) pour faire la partie PHP.</strong></p>
+<p>Pour ce TP, vous utiliserez la ferme de machines virtuelles de l'université. Nous avons préparé une configuration spéciale comprenant une Ubuntu 16.04 serveur (sans window manager) avec un serveur nginx (1.10.1) préinstallé. Ces machines ne sont accessibles que depuis l'intérieur de l'université.</p>
+<p>Votre encadrant vous aura assigné une VM par binôme. Cette VM tournera déjà et vous y aurez accès par son adresse IP. Vous vous connecterez dessus en SSH avec l'utilisateur "etudiant/etudiant". Cet utilisateur est dans le groupe de sudoers.</p>
+<p><strong>L'adresse IP de votre VM est "192.168.75." plus le numéro de binôme qui vous a été attribué par votre enseignant.</strong></p>
+<p><strong>Dans Tomuss, indiquez les 3 derniers chiffres (dernier octet) de cette adresse IP dans la case prévue à cet effet.</strong></p>
+<p>L'exécutable nginx est <span class="code">/usr/sbin/nginx</span> et les fichiers de configuration sont dans le répertoire <span class="code">/etc/nginx/</span>. La config de base est dans le fichier <span class="code">nginx.conf</span>.</p>
+
+<h2 id="prise_en_main">1. Prise en main d'nginx</h2>
+<p>Vérifiez que le serveur HTTP nginx de votre VM est lancé et qu'il fonctionne.</p>
+
+<p class="bleu">Les commandes pour démarrer/arrêter nginx sont détaillées à <a href="http://nginx.org/en/docs/beginners_guide.html#control">http://nginx.org/en/docs/beginners_guide.html#control</a>.</p>
+
+<p>À l'aide de commandes Unix de base, de la documentation d'nginx et du Web, répondez aux questions suivantes :</p>
+
+<strong><ol>
+<li>Quel est l'utilisateur qui a lancé le serveur ? Pourquoi ?</li>
+<li>Quel est l'utilisateur qui fait tourner les "workers" ? Pourquoi ?</li>
+<li>Indiquez la fonction des principaux éléments (sous-répertoires, fichiers par thématique) du répertoire de configuration d'nginx.</li>
+<li>Que signifie la deuxième ligne (non vides) du fichier nginx.conf et comment vérifier qu'elle est bien prise en compte ?</li>
+<li>Où est spécifié le port sur lequel répond le serveur (fichier et directive) ?</li>
+<li>Quel est le répertoire où se trouvent les données du site (fichier et directive) ? Pour vérifier, modifiez la page d'accueil de ce site, et constatez le résultat dans le navigateur.</li>
+</ol></strong>
+
+<h2 id="configuration">2. Configuration d'un site Web</h2>
+<p>Dans cette partie, vous allez modifier le site existant et mettre en place votre propre site Web. Pour cela, identifiez le mécanisme qui permet de définir l'emplacement des différents sites hébergés par le serveur.</p>
+<p>Pour conserver les conventions habituelles (héritées d'Apache), les différents sites ou parties de site que vous créerez dans cette partie seront placés dans le répertoire <span class="code">/var/www</span>.<br/>
+Conseil : changez l'utilisateur propriétaire de ce répertoire pour pouvoir éviter la commande sudo à chaque manipulation dessus...</p>
+
+<p class="bleu">Vous trouverez des astuces / patterns de configuration et les erreurs les plus souvent commises dans la configuration d'nginx sur <a href="https://www.nginx.com/resources/wiki/start/topics/tutorials/config_pitfalls/">cette page</a>.</p>
+
+<h3 id="config_site">2.1. Configuration d'un site existant</h3>
+<ol>
+<li>Créez un sous-répertoire <span class="code">html</span> de <span class="code">/var/www</span> et changez le répertoire où sont stockés les fichiers du site par défaut pour ce sous-répertoire.<br/>
+<strong>Indiquez le nom du fichier de configuration que vous avez modifié et le contenu que vous avez modifié.</strong></li>
+<li>Créez un sous-répertoire <span class="code">images</span> de <span class="code">/var/www</span>. &Agrave; l'aide de la directive <a href="http://wiki.nginx.org/HttpCoreModule#alias">alias</a>, modifiez le fichier de configuration du site default pour gérer les images de ce site dans ce répertoire. Pour cela, ajoutez-y une directive de bloc <span class="code">location</span> pour mapper l'URL <span class="code">/images</span> du site vers ce répertoire. Pour tester, vous pouvez utiliser la commande suivante pour placer un fichier dans le répertoire images :<br/>
+<span class="code">wget perso.liris.cnrs.fr/lionel.medini/enseignement/logo_UCBL_transparent.gif</span>. Modifiez ensuite le fichier index.html pour qu'il inclue l'image, de façon à avoir un résultat similaire à l'image ci-dessous.<br/><br/><img src="premiere_page.png" alt="première page nécessitant plusieurs requêtes avec nginx" style="width: 400px;"/><br/>
+<strong>Copiez-collez les modifications apportées au fichier de configuration dans la réponse au questionnaire.</strong></li>
+</ol>
+
+<h3 id="nouveau_site">2.2. Mise en place d'un nouveau site</h3>
+
+<p>Créez un site différent du site par défaut, que vous appelerez "monsite", qui répondra sur le port 8080 dont les données se trouveront dans un sous-répertoire de <span class="code">/var/www</span>. Copiez-y la page d'accueil de votre site principal et modifiez un peu le texte pour pouvoir la reconnaître.</p>
+<p><strong>1. Indiquez la configuration que vous avez faite pour que "monsite" réponde et copiez-collez les parties significatives des fichiers créés ou modifiés.</strong></p>
+<p><em>Remarque&nbsp;:</em> sur les anciennes versions d'nginx, la configuration et l'activation des sites se fait à l'aide de liens symboliques (commande <span class="code">ln -s</span>) entre des répertoires nommés <span class="code">sites-available</span> et <span class="code">sites-enabled</span>. Ce mode de configuration est un héritage de la configuration d'Apache, et n'est plus utilisé dans la version que vous avez sur votre VM. &Agrave; vous de trouver le bon tuto / la bonne façon de configurer le serveur...</p>
+
+<h3 id="php">2.3. Scripting côté serveur</h3>
+<p>Dans cette question, vous allez faire en sorte que monsite interprête les fichiers PHP, alors que le site principal sera utilisé pour servir les fichiers statiques.</p>
+<ol>
+<li>Rajoutez dans monsite un fichier PHP simple (<span class="code">&lt;?php phpinfo(); ?&gt;</span>) et&nbsp;requêtez-le avec votre navigateur. Comme PHP n'est pas installé sur le serveur, le fichier n'est pas interprêté.<br/>
+<strong>Décrivez et expliquez - côté serveur et côté client - ce qui se passe et la raison pour laquelle vous obtenez ce comportement.</strong><br/>
+Aide&nbsp;: utilisez les outils de développement de votre navigateur pour voir les en-têtes HTTP.</li>
+<li>Vous allez donc devoir installer un interprêteur PHP sur la machine et configurer nginx en conséquence. L'implémentation choisie est <a href="http://php-fpm.org/">PHP-FPM (FastCGI process manager for PHP)</a>. La documentation officielle pour configurer nginx pour PHP-FPM est située <a href="http://wiki.nginx.org/PHPFcgiExample">ici</a>. Toutefois, je vous conseille de suivre <a href="https://www.linode.com/docs/web-servers/nginx/serve-php-php-fpm-and-nginx/">ce tutoriel</a> pour installer le module php7-fpm.<br/>
+<em>Attention</em> : PHP-FPM a besoin des droits en exécution sur les fichiers PHP. &Agrave; vous d'ajouter ces droits sur aux utilisateurs du groupe www-data dans le répertoire correspondant.
+<br/> Une fois la configuration réalisée, requêtez à nouveau votre fichier PHP pour vérifier que l'installation a réussi.<br/>
+<strong>Copiez-collez la valeur du champ "System" affiché sur la page.</strong></li>
+</ol>
+
+<h2 id="front">3. Front server / reverse proxy</h2>
+<p>Vous allez maintenant configurer votre site par défaut pour qu'il délègue les requêtes sur les fichiers PHP au site "monsite". Pour cela, utilisez la doc d'nginx située <a href="http://nginx.com/resources/admin-guide/reverse-proxy/">ici</a>.</p>
+
+<p>Pour tester, créez une première application Web comme suit&nbsp;</p>
+<ul>
+<li>Modifiez le fichier index.html pour qu'il contienne un formulaire qui demande des données à l'utilisateur (par exemple, taper son prénom et choisir une langue) et qu'il l'envoie à une page PHP. Pour vous faire gagner du temps, voici un exemple de formulaire à copier-coller :
+<pre><span class="code">
+&lt;form action="./hello.php" method="POST"&gt;
+  First name:&lt;br&gt;
+  &lt;input type="text" name="name"&gt;&lt;br&gt;
+  
+  &lt;input type="radio" name="lang" value="en" checked&gt; English&lt;br&gt;
+  &lt;input type="radio" name="lang" value="fr"&gt; Français&lt;br&gt;
+
+  &lt;input type="submit" value="Send"&gt;
+&lt;/form&gt;
+</span></pre></li>
+<li>Créez maintenant la page PHP qui souhaitera le bonjour à cet utilisateur dans la langue de son choix :
+<pre><span class="code">
+&lt;?php
+if(isset($_POST["name"])) {
+	if(isset($_POST["lang"]) && $_POST["lang"] === "en"){
+		echo ("Bonjour : " . htmlspecialchars($_POST["name"]) . " !");
+		} elseif(isset($_POST["lang"]) && $_POST["lang"] === "fr") {
+			echo ("Hi: " . htmlspecialchars($_POST["name"]) . "!");
+		} else {
+			echo ("Buongiorno : " . htmlspecialchars($_POST["name"]) . " !");
+		}
+	} else {
+		echo ("Please fill at least your name.");
+}
+?&gt;</span></pre></li>
+<li>Ajoutez un lien <strong>relatif</strong> pour que l'utilisateur puisse retourner sur la page d'accueil depuis la réponse générée par la page PHP</li>
+<!--li>Pour égayer, vous pouvez rajouter des images représentant les drapeaux des pays avec les langues concernées, et pourquoi pas une feuille CSS...</li-->
+<!--li>Pour améliorer le service rendu à l'utilisateur, vous pouvez aussi lui permettre de saisir du texte et utiliser un <a href="http://www.programmableweb.com/news/63-translation-apis-bing-google-translate-and-google-ajax-language/2013/01/15">service de traduction en ligne</a> pour traduire ce texte dans la langue de son choix...</li-->
+</ul>
+
+<p><strong>1. Comparez les URI des liens générés par la page PHP selon qu'elle est requêtée à partir du site default ou de monsite. Que constatez-vous&nbsp;?</strong></p>
+
+<p class="bleu">Vous avez maintenant deux sites qui répondent sur des ports différents du serveur. Seul "monsite" permet d'interprêter du PHP, et le port 8080 sur lequel il répond est masqué au client par la directive qui met en oeuvre le reverse proxy. L'intérêt est de conserver un serveur en front qui se contentera de servir des requêtes simples et de déléguer les traitements plus complexes à d'autres serveurs (PHP, CGI, serveur Java, etc.).</p>
+
+<h2 id="sessions">4. Gestion des sessions</h2>
+<p>Vous allez modifier votre site PHP pour qu'il utilise la <a href="http://php.net/manual/en/book.session.php">gestion de session PHP</a> pour conserver des informations sur l'utilisateur (en l'occurrence, une chaîne de caractères représentant son pseudo).</p>
+<ol>
+<li>Créez une page d'accueil en PHP qui :</li>
+<ul>
+<li>redirige tout utilisateur non identifié (n'ayant pas renseigné son pseudo) vers un formulaire lui demandant de le renseigner ; ce formulaire envoie vers une nouvelle page PHP qui :
+<ol>
+<li>ajoute le pseudo à la session</li>
+<li>redirige ensuite l'utilisateur vers la page d'accueil de l'application à l'aide d'une redirection HTTP</li>
+</ol></li>
+<li>redirige tout utilisateur identifié vers la page statique contenant le formulaire de la question précédente</li>
+</ul>
+<li>Modifiez votre page PHP initiale (celle qui dit bonjour dans plusieurs langues) pour qu'elle commence par afficher le peudo de l'utilisateur, puis " vous dit : ", puis son affichage précédent<br/>
+Par exemple : si mon pseudo est Lionel et si j'ai entré le prénom Toto et la langue anglaise dans le formulaire, je devrais obtenir : <span class="code">Lionel vous dit : Hello Toto</span></li>
+</ul>
+<p>Testez le fonctionnement de votre application et vérifiez en particulier que vous pouvez envoyer plusieurs requêtes à partir de la page d'index et que le serveur se souvient de votre pseudo. Identifiez ensuite le mécanisme de gestion des sessions utilisé.</p>
+<p><strong>1. Quel est ce mécanisme ? Comment faire pour que le serveur vous "oublie" ?</strong></p>
+<p>Vérifiez en faisant la manipulation proposée et en observant les headers HTTP.</p> 
+
+<h2 id="repartition">5. Répartition de la charge (load balancing)</h2>
+<p>Rajoutez à votre site dynamique une page PHP dans laquelle vous introduirez une latence qui mettra un peu de temps (5 secondes) à répondre. Dupliquez ensuite ce site, et faites en sorte que chaque instance affiche un numéro différent (pour pouvoir savoir celle qui répond) dans la réponse finale. Finalement, configurez le front nginx pour qu'nginx répartisse la charge en fonction du plus petit nombre de connexions de chacun des sites (voir la <a href="http://nginx.org/en/docs/http/load_balancing.html">documentation</a>)<br/>
+Attention : la directive http est déjà dans le fichier nginx.conf qui inclut les fichiers de chacun de vos sites. Il ne faut donc pas la réécrire.</p>
+<ol>
+<li>Requêtez plusieurs fois la page avec des clients / onglets différents pour vérifier le bon fonctionnement de la répartition. Incluez maintenant cette page contenant la boucle dans votre application qui dit bonjour (et dupliquez-la également, si ce n'est pas déjà fait). Testez-en le fonctionnement derrière le processus de load balancing.<br/>
+<strong>Que se passe-t-il ? Pourquoi ?</strong></li>
+<li>Passez ensuite en mode de répartition par hash des adresse IP. Testez à nouveau.</br>
+<strong>Que se passe-t-il ? Comment vérifier tout de même que le load balancing fonctionne ?</strong></li>
+</ol>
+<h2 id="cache">6. Gestion du cache</h2>
+<p>Effacez le cache de votre navigateur, et via la console de développement, affichez les paramètres réseau.</p>
+<ol>
+<li>Faites ensuite une requête vers l'un des fichiers HTML statiques de votre site default et observez les détails de la transaction HTTP dans la console.<br/>
+<strong>Quel est le code de statut renvoyé ? Quels sont les headers de gestion du cache présents dans la réponse ?</strong></li>
+<li>Actualisez la page et observez à nouveau la transaction dans la console.<br/>
+<strong>Quel est le code de statut renvoyé après actualisation ? Quels sont les headers de gestion du cache présents dans la requête et dans la réponse ?</strong></li>
+<li>Maintenant, éditez et modifiez la page sur le serveur et actualisez la page côté client.<br/>
+<strong>Quel est le code de statut renvoyé après modification + actualisation ? Quels sont les headers de gestion du cache présents dans la requête et dans la réponse ?</strong></li>
+<li>Sur votre site dynamique (PHP), faites une requête d'envoi du formulaire et observez les headers HTTP.<br/>
+<strong>Quels sont les headers de gestion du cache dans le cas d'une requête POST ?</strong></li>
+<li>Modifiez le comportement de gestion du cache concernant les pages statiques pour que le cache soit mis à jour toutes les minutes, et vérifiez le nouveau fonctionnement.<br/>
+<strong>Quelle directive avez-vous utilisée ? Quels sont les headers de gestion du cache échangés ?</strong></li>
+</ol>
+<p>Revenez à l'état initial.</p>
+
+<!--
+<h2>Négociation de contenus</h2>
+<p>Pour l'année prochaine, pas d'idée...</p>
+-->
+</div>
+
+<div id="validation">
+<a href="http://validator.w3.org/check?uri=referer"><img src="http://www.w3.org/Icons/valid-xhtml10" alt="Valid XHTML 1.0 Transitional" style="height: 31px; width: 88px" /></a>
+</div>
+<script type="text/javascript" src="https://perso.liris.cnrs.fr/~lmedini/js/menu.js"></script>
+
+</body></html>

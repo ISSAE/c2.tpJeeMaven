@@ -1,0 +1,134 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="fr" lang="fr">
+<head>
+<meta http-equiv="content-type" content="application/xml+xhtml; charset=utf-8" />
+<meta http-equiv="content-language" content="fr" />
+<link rel="stylesheet" type="text/css" media="screen" href="https://liris.cnrs.fr/lionel.medini/enseignement/medini.css" />
+<link rel="stylesheet" type="text/css" media="print" href="https://liris.cnrs.fr/lionel.medini/enseignement/medini-print.css" />
+<script type="text/javascript" src="https://perso.liris.cnrs.fr/~lmedini/js/menu.js"></script>
+<title>MIF13 - TP GWT</title>
+</head>
+<body>
+<div id="principale">
+<h1>TP 7 : Google Web Toolkit</h1>
+<h2 id="objectifs">Objectifs p&eacute;dagogiques du TP</h2>
+<ul>
+<li>Se familiariser avec la biblioth&egrave;que GWT</li>
+<li>Concevoir une application c&ocirc;t&eacute; client</li>
+<li>Utiliser les m&eacute;canismes GWT d'appel asynchrone
+au serveur</li>
+</ul>
+<h2 id="outils">Outils</h2>
+<ul>
+<li><span style="font-weight: bold;">Logiciels install&eacute;s sur les machines de TP :</span> Navigateurs Web, EDI NetBeans, serveur Tomcat</li>
+<li><span style="font-weight: bold;">Logiciels libres que vous pouvez installer chez vous :</span> idem.</li>
+<li><a href="http://code.google.com/intl/fr/webtoolkit/">Bibliothèque GWT</a> ;  accès direct au zip sur le site Google code <a href="http://google-web-toolkit.googlecode.com/files/gwt-2.4.0.zip">ici</a> ou en local <a href="https://perso.liris.cnrs.fr/~lmedini/enseignement/M1IF03/TP/gwt-2.4.0.zip">là</a> (&agrave; télécharger et décompacter dans un répertoire visible par NetBeans).</li>
+<li><a href="https://perso.liris.cnrs.fr/~lmedini/enseignement/M1IF03/Ressources/gwt4nb">Répertoire local</a> contenant le plugin GWT4NB</li>
+</ul>
+
+<h2 id="references">R&eacute;f&eacute;rences</h2>
+<ul>
+<li>Voir partie "<a href="http://www710.univ-lyon1.fr/~lmedini/MIF13/">Liens utiles</a>" de la page d'accueil du cours et références dans les transparents du <a href="http://www710.univ-lyon1.fr/~lmedini/MIF13/CM/6_Bibliotheques.pdf">cours 6</a></li>
+<li><span style="font-weight: bold;">Tutoriels :</span>
+<ul>
+<li><a href="https://netbeans.org/kb/74/web/quickstart-webapps-gwt.html">https://netbeans.org/kb/74/web/quickstart-webapps-gwt.html</a></li>
+<li><a href="http://www.gwtproject.org/doc/latest/tutorial/gettingstarted.html">http://www.gwtproject.org/doc/latest/tutorial/gettingstarted.html</a></li>
+</ul>
+</li>
+</ul>
+
+<h2 id="preambule">Pr&eacute;ambule</h2>
+<p>Cr&eacute;ez un projet sur la forge, dans lequel vous déposerez tous les fichiers &agrave; rendre dans ce TP. Merci de ne rendre que les fichiers demand&eacute;s, les autres ne seront pas notés.</p>
+
+<!--
+<h3 id="installation">Installation du plugin GWT</h3>
+<p style="font-weight: bold">Cette étape est à faire une fois la bibliothèque GWT téléchargée et dézippée.</p>
+<p>Dans NetBeans, la gestion des plugins se fait dans le menu "Outils -&gt; Plugins". Naviguez dans les diff&eacute;rents onglets pour rechercher le plugin "GWT4NB", et d&eacute;terminer s'il est install&eacute; et activ&eacute;.</p>
+<p>Si ce n'est pas le cas, t&eacute;l&eacute;chargez-le, installez-le et activez-le. Le lien vers le tutoriel de la partie "Outils" (en anglais) peut vous y aider.</p>
+-->
+<h2 id="part1">Premi&egrave;re partie</h2>
+<p>Dans cette partie, vous allez r&eacute;aliser une application GWT tr&egrave;s simple, pour prendre en main la biblioth&egrave;que.</p>
+
+<h3 id="creation_projet">Premier projet GWT</h3>
+<p>Récupérez le code source du projet situé ici : <a href="http://forge.univ-lyon1.fr/projects/m1-mif13-tp-gwt-base-2014/">http://forge.univ-lyon1.fr/projects/m1-mif13-tp-gwt-base-2014/</a>. Compilez, déployez sur Tomcat et testez. Observez le source de la page principale.</p>
+
+<p>Importez ensuite le projet dans votre IDE préféré. Observez les diff&eacute;rents &eacute;l&eacute;ments suivants :</p>
+<ul>
+<li>Page Web
+<ul>
+<li>TpGWT.html : page d'accueil de votre application (d'ailleurs r&eacute;f&eacute;renc&eacute;e comme telle dans le fichier de configuration web.xml).</li>
+</ul>
+</li>
+<li>Fichiers de configuration
+<ul>
+<li>web.xml : fichier standard d'une application Web Tomcat. <span style="font-style: italic;">Cf.</span> cours sur la programmation Web.</li>
+<li>TpGWT.gwt.xml (dans le package source Java) : fichier de configuration de votre projet GWT. Permet de d&eacute;finir les "modules" de votre application et de les param&eacute;trer (voir plus loin).</li>
+</ul>
+</li>
+<li>Packages Java
+<ul>
+<li>fr.ucbl.mif13.client : partie du code d&eacute;ploy&eacute;e sur le client</li>
+<li>fr.ucbl.mif13.server : partie du code d&eacute;ploy&eacute;e côté serveur</li>
+<li>fr.ucbl.mif13.shared : partie du code commune</li>
+<li>TpGWT (EntryPoint) : comme son nom l'indique, c'est l&agrave; que se situe l'impl&eacute;mentation du projet, et c'est la classe principale, qui sera compil&eacute;e en JavaScript et d&eacute;ploy&eacute;e sur le client.<br /> Remarque : Dans ses derni&egrave;res lignes, le code fait appel &agrave; un objet RootPanel, qui repr&eacute;sente la fen&ecirc;tre de votre application et auquel il faut ajouter tous les composants de l'interface.</li>
+</ul>
+</li>
+</ul>
+<p>Pour comprendre comment fonctionne ce code, faites-le tourner, et analysez le comportement de la page visualis&eacute;e en fonction du code de la classe EntryPoint. Aidez-vous de la Javadoc dont l'URL est sur la page d'accueil du module et de la console de développement de FireFox, qui vous permet de voir en temps r&eacute;el le HTML correspondant au code affich&eacute;.</p>
+
+<h3 id="premieres_modifs">Premi&egrave;res modifications</h3>
+
+<p>GWT permet de construire son interface comme on le ferait avec Swing en utilisant un modèle de boîte simple qui abstrait le positionnement CSS. Nous allons enrichir le formulaire en rajoutant un champ email et en transformant le pop-up en une notification qui apparait disparait sous le formulaire.</p>
+
+<h4>Ajout de composants d'interface </h4>
+<ul>
+<li>Rajouter un Panel global qui va contenir tout le formulaire, pour que les différents éléments ne soient pas directement rattaché au RootPanel.</li>
+<li>Rajouter un Horizontal Panel autour du nom.</li>
+<li>Rajouter un autre Horizontal Panel pour un champ email que vous aller créer.</li>
+<li>Déplacer le bouton Send en dessous de ces deux panneaux.</li>
+<li>Modifier le Dialogbox pour qu'il devienne un Panel de notification positionné sous le formulaire.</li>
+</ul>
+<h4>Modification du modèle événementiel</h4>
+<p>Peupler le panel de notification en fonction des réponses du serveur. Tenir compte pour cela des vérifications sur la validité des champs (voir ci-dessous).</p>
+
+<h4>Validation de formulaires</h4>
+<p><strong>Côté shared</strong></p>
+<ul>
+<li>Rajouter une vérification du champs email (présence du @ et d'un .), dans la classe FieldVerifier.</li>
+<li>Faire en sorte que cette vérification soit faite côté client et côté serveur.</li>
+</ul>
+<p><strong>Côté serveur</strong></p>
+<p>Vérifier que cet email fait partie d'une liste d'email connue (codée en dur), et renvoyer un message en fonction au client. Par exemple, "Content de vous revoir XXX" si l'email existe, et "Bienvenue XXX" sinon.</p>
+
+<h4>Ajout / utilisation d'une feuille de style</h4>
+<p><strong>Ajout</strong> (alternativement) :</p>
+<ul>
+<li>En ajoutant le code suivant dans le fichier Main.gwt.xml (&agrave; la fin de l'&eacute;l&eacute;ment "module") :&nbsp;<span class="code">&lt;stylesheet src="URL de votre feuille de style CSS"/&gt;</span></li>
+<li>En ajoutant une feuille de style directement dans le code de la page TpGWT.html</li>
+</ul>
+<p>Utilisation :</p>
+<ul>
+<li>Pour mettre en oeuvre des styles sp&eacute;cifi&eacute;s dans une feuille de style &agrave; l'aide de l'attribut "class", vous pouvez utiliser la m&eacute;thode setStylePrimaryName() de Widget.</li>
+<li>Si le s&eacute;lecteur est de type #id, vous devez sp&eacute;cifier un attribut id &agrave; vos &eacute;l&eacute;ments HTML. Pour cela, il faut utiliser la m&eacute;thode <span class="code">setAttribute()</span> de <span class="code">com.google.gwt.dom.client.Element</span>. La r&eacute;cup&eacute;ration de l'&eacute;l&eacute;ment correspondant &agrave; un &eacute;l&eacute;ment d'interface se fait avec la m&eacute;thode <span class="code">getElement()</span> de <span class="code">Widget</span>.
+</li>
+</ul>
+<p>Modifiez la feuille de style et faites en sorte d'utiliser les styles CSS définis depuis voter code Java.</p>
+
+<h2 id="part2">Deuxi&egrave;me partie</h2>
+
+<h3>Création du projet</h3>
+<p>Vous devrez tout d'abord installer le plugin qui correspond à votre IDE. Pour NetBeans, il s'appelle GWT4NB, et pour Eclipse : Google Plugin for Eclipse (doc <a href="https://cloud.google.com/appengine/docs/java/tools/eclipse">ici</a>). Après avoir installé le plugin GWT, cr&eacute;ez un nouveau projet de type "Java Web -&gt; Web application", et suivez les diff&eacute;rents menus jusqu'&agrave; celui qui vous permettra de choisir un "framework", et cochez "Google Web Toolkit".</p>
+
+<h3>Reprise de votre application Tortue</h3>
+<p>Reprenez le code de l'application Logo + design patterns que vous avez réalis&eacute;e en MIF17 et portez-la c&ocirc;t&eacute; client en utilisant GWT.</p>
+
+<h2 id="rendu">Rendu du TP</h2>
+<p style="font-weight:bold">Ce TP est à rendre pour le lundi 1er décembre 2014.</p>
+<p>Ne rendez que la derni&egrave;re question (tortues).</p>
+</div>
+<div id="validation">
+<a href="http://validator.w3.org/check?uri=referer"><img src="http://www.w3.org/Icons/valid-xhtml10" alt="Valid XHTML 1.0 Transitional" style="height: 31px; width: 88px" /></a>
+</div>
+</body>
+</html>

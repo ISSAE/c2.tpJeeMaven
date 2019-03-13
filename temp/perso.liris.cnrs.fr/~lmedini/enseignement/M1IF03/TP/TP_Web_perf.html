@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html xml:lang="fr" lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta http-equiv="Content-Language" content="fr" />
+<meta http-equiv="Author" content="Lionel Médini" />
+<link rel="stylesheet" type="text/css" media="screen" href="https://liris.cnrs.fr/lionel.medini/enseignement/medini.css" />
+<link rel="stylesheet" type="text/css" media="print" href="https://liris.cnrs.fr/lionel.medini/enseignement/medini-print.css" />
+<script type="text/javascript" src="https://perso.liris.cnrs.fr/~lmedini/js/menu.js"></script>
+<title>M1IF03 - TP6 : Web Performance</title>
+</head>
+<body>
+<div id="principale">
+<h1>TP 6 : Web Performance</h1>
+<h2 id="objectifs">Objectifs p&eacute;dagogiques du TP</h2>
+<ul>
+<li>Utiliser des outils d'analyse de performance des applications Web</li>
+<li>Utiliser les APIs de performance des navigateurs</li>
+</ul>
+
+<h2 id="outils">Outils</h2>
+<ul>
+<li><strong>Machines de TP</strong> (connectées en filaire) <strong>sous Linux</strong></li>
+<li>Navigateur Chrome / Chromium et outils de développement Web (Performance / Timeline)</li>
+<li>Application en ligne : <a href="https://www.webpagetest.org/">WebPageTest</a></li>
+<li>Specs
+<ul>
+<li><a href="https://w3c.github.io/perf-timing-primer/">Web Performance Timing API</a></li>
+<li><a href="https://www.w3.org/TR/navigation-timing-2/">Navigation Timing Level 2</a></li>
+<li><a href="https://www.w3.org/TR/performance-timeline/">Performance Timeline Level 2</a></li>
+</ul></li>
+</ul>
+
+<p>Remarque : si vous n'arrivez pas à démarrer Chromium sous Linux, essayez de supprimer le répertoire .config/chromium dans votre home directory.</p>
+
+<p><strong>&Agrave; faire avant de débuter le TP : désactiver le cache et les plugins de blocage de contenus (Adblock, Ghostery...) de votre navigateur.</strong></p>
+
+<h2 id="rendu">Rendu du TP</h2>
+
+<p>Vous répondrez dans un document réalisé avec un traitement de texte selon <a href="TP6/Modele_TP6_M1IF03.rtf">ce modèle</a>. Vous uploaderez ce document <strong>en PDF</strong> dans Tomuss, sur la page de l'UE, à la fin du TP.</p>
+
+<div class="bleu">Les éléments en bleu indiquent les opérations à réaliser dans ce document.</div>
+
+<p>Dans ce TP, vous allez r&eacute;aliser l'analyse d'une application Web existante : celle de l'Université Claude Bernard Lyon 1.</p>
+
+<h2 id="devtools">Utilisation de la console du navigateur</h2>
+
+<p>Ouvrez les Dev Tools de Chrome (onglet Performance ou Timeline, selon les versions). Lancez le chargement de l'application (page d'accueil de l'université) et identifiez les différents temps indiqués <strong>pour un même jeu de mesures</strong> :</p>
+<ul>
+<li>récupération de la page HTML (transaction HTTP)</li>
+<li>récupération de la / des feuille(s) CSS (transaction(s) HTTP à partir du début de la navigation) ; <span style="font-weight: bold;">ne tenez pas compte des CSS demandées par YouTube et TarteAuCitron</span></li>
+<li>fin du premier rendu (de la page blanche au premier contenu)</li>
+<li>fin du rendu de l'app shell (cadre applicatif sans contenu)</li>
+<li>fin du chemin critique de rendu (cf. cours)</li>
+<li>durée totale du chargement</li>
+</ul>
+<div class="bleu">Indiquez ces valeurs dans le document de rendu.</div>
+
+<h2 id="timing_api">Utilisation des APIs de performance</h2>
+
+<h3 id="operations">Opérations à réaliser</h3>
+
+<ul>
+<li>&Agrave; l'aide du document <a href="https://w3c.github.io/perf-timing-primer/">Performance Timing Primer</a> et de la spec <a href="https://www.w3.org/TR/navigation-timing-2/">Navigation Timing Level 2</a>, créez un script qui vous permettra d'obtenir les temps de récupération de la page HTML et de création du DOM.<br/>
+Aide : le comptage du temps commence à <span class="code">timeOrigin</span>.</li>
+<li>&Agrave; l'aide de la spec <a href="https://www.w3.org/TR/performance-timeline/">Performance Timeline</a>, déterminez comment obtenir les temps de chargement des données nécessaires à la création du CSSDOM, de l'app shell et du CRP.</li>
+</ul>
+
+<p>Vous exécuterez ces scripts dans la console de votre navigateur. Pour chaque valeur, il vous est demandé d'effectuer une série de 10 mesures, de supprimer les 2 extrêmes et de calculer la moyenne des 8 restantes.</p>
+
+<div class="bleu">Collez le code du script utilisé dans le document de rendu.</div>
+
+<h3 id="normal">Mesures en conditions normales</h3>
+
+<div class="bleu">Effectuez ces mesures depuis les machines de TP et copiez-collez ces moyennes dans un tableur ET dans le document de rendu.</div>
+
+<h3 id="contexte">Modification du contexte client</h3>
+
+<p>Renouvelez maintenant ces opérations en simulant un réseau 3G rapide (network throttling), puis un terminal de type ipad (settings -> devices) avec un réseau normal.</p>
+
+<div class="bleu">Procédez comme à la question précédente.</div>
+
+<h2 id="webpagetest">Analyse avec WebPageTest</h2>
+<p>Allez sur le site <a href="https://www.webpagetest.org/">WebPageTest</a>.</p>
+
+<ul>
+<li>Lancez le chargement de la page d'accueil de l'université, sans simuler de perturbations, mais à partir de plusieurs endroits du globe (Amérique, Asie...). Notez les valeurs des temps correspondants.</li>
+<li>Dans l'onglet "Performance Review", observez ce qui s'est bien passé, et ce qui pourrait être amélioré, pour vous en souvenir à la question suivante...</li>
+</ul>
+
+<div class="bleu">Reportez ces données dans le document.</div>
+
+<div class="bleu">Identifiez les valeurs (presques) correspondantes entre les résultats obtenus avec l'API et avec WebPageTest. Vous pouvez combiner plusieurs valeurs ensemble.</div>
+
+<p>Dans votre tableur, faites un graphique permettant de comparer les valeurs correspondantes pour chacune de ces conditions. Tirez-en une synthèse / conclusion.</p>
+
+<div class="bleu">Copiez-collez le graphique et la synthèse dans votre document.</div>
+
+<h2 id="comparaison">Comparaison d'applications Web</h2>
+
+<p>Retournez à la page d'accueil de WebPageTest. Dans l'onglet "Visual Comparison", comparez le démarrage des pages d'accueil des universités Lyon 1 et Lyon 2. Si vous deviez donner un conseil aux Webmasters de votre université au sujet de l'optimisation du chemin critique de rendu, quel serait-il ?</p>
+
+<div class="bleu">Répondez à cette question dans le document de rendu. </div>
+
+<!--h2 id="rendu">Rendu du TP</h2>
+<p>Le compte-rendu de ce TP est à rendre pour la <strong>fin de la dernière séance de TP.</strong></p>
+<p>Vous n'oublierez pas de remplir <a href="http://spiralconnect.univ-lyon1.fr/webapp/assessment/assessmentAnswer.html?id=2665772&mode=answer">ce questionnaire Spiral</a>.</p>
+
+<p>Votre Compte-rendu doit contenir :</p>
+<ul>
+<li>les noms, prénoms, numéros d'étudiant de chaque étudiant</li>
+<li>l'identifiant de votre projet sur la forge</li>
+<li>Indiquez dans un fichier joint au dépôt les optimisations que vous avez effectuées sur votre projet chat par rapport à la version précédente, et les gains obtenus.</li>
+</ul-->
+</div>
+<div id="license"><a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/fr/"><img alt="Licence Creative Commons" style="border-width:0" src="http://i.creativecommons.org/l/by-nc-sa/3.0/fr/88x31.png" /></a></div>
+
+<div id="validation">
+<a href="http://validator.w3.org/check?uri=referer"><img src="http://www.w3.org/Icons/valid-xhtml10" alt="Valid XHTML 1.0 Strict" height="31" width="88" /></a>
+
+</div>
+</body></html>

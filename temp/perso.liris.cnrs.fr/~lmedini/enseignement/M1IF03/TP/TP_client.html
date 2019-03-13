@@ -1,0 +1,186 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head>
+<meta http-equiv="Content-Type" content="application/xml+xhtml; charset=iso-8859-1" />
+<meta http-equiv="Content-Language" content="fr" />
+<meta name="author" content="Lionel Médini" />
+<meta name="description" content="MIF13 TP client" />
+<meta name="keywords" content="MIF13,XHTML,CSS,XML,SVG,JavaScript" />
+<title>TP 1</title>
+<link rel="stylesheet" type="text/css" media="screen" href="https://perso.liris.cnrs.fr/~lmedini/enseignement/medini.css" />
+<link rel="stylesheet" type="text/css" media="print" href="https://perso.liris.cnrs.fr/~lmedini/enseignement/medini-print.css" />
+<script type="text/javascript" src="affiche_infos.js"></script>
+</head>
+<body>
+<div id="menu">
+<h2>Menu</h2>
+<div class="lienh2"><a href="TP_client.html#principale">Haut de la page</a></div>
+<div class="lienh2"><a href="TP_client.html#objectifs_pedagogiques">Objectifs p&eacute;dagogiques</a></div>
+<div class="lienh2"><a href="TP_client.html#outils">Outils</a></div>
+<div class="lienh2"><a href="TP_client.html#preambule">Préambule</a></div>
+<div class="lienh2"><a href="TP_client.html#html">HTML et XHTML</a></div>
+<div class="lienh3"><a href="TP_client.html#indications">Indications</a></div>
+<div class="lienh2"><a href="TP_client.html#xml">XML</a></div>
+<div class="lienh2"><a href="TP_client.html#dtd">DTD</a></div>
+<div class="lienh2"><a href="TP_client.html#xsl">XSL</a></div>
+<div class="lienh2"><a href="TP_client.html#css">CSS</a></div>
+<div class="lienh3"><a href="TP_client.html#css_creation">Création</a></div>
+<div class="lienh3"><a href="TP_client.html#css_js">CSS + JavaScript</a></div>
+<div class="lienh3"><a href="TP_client.html#css_existant">Utilisation d'une feuille existante</a></div>
+<div class="lienh2"><a href="TP_client.html#svg">SVG</a></div>
+<div class="lienh2"><a href="TP_client.html#javascript">JavaScript</a></div>
+<div class="lienh2"><a href="TP_client.html#rendu">Instructions de rendu</a></div>
+</div>
+
+<div id="principale">
+<h1>TP 1 : technologies côté client</h1>
+<h2 id="objectifs_pedagogiques">Objectifs pédagogiques du TP</h2>
+<ul>
+<li>Se familiariser avec les principaux langages de description de documents utilisés côté client&nbsp;: (X)HTML, XML, CSS, XSL, SVG</li>
+<li>Avoir un aperçu des autres technos disponibles et savoir les intégrer dans une page Web</li>
+</ul>
+<h2 id="outils">Outils</h2>
+<ul>
+<li><b>Logiciels installés sur les machines de TP :</b>
+Navigateurs Web, éditeur de texte, Editeur HTML WYSIWYG (Microsoft Frontpage ou autre), Altova XMLSpy</li>
+<li><b>Logiciel libre que vous pouvez installer chez vous :</b> éditeur HTML + validateur XML : HTML-Kit&nbsp; (<a href="http://www.chami.com/">http://www.chami.com/</a>
+ou copie locale accessible <a href="http://www710.univ-lyon1.fr/%7Elmedini/CCI/2006-2007/XML/HTML-Kit/">ici</a>)
++ plugin XML Validator (menu <span style="font-style: italic;">Tools/Install/Install Plugin</span>)</li>
+<li><b>Tutoriels :</b> voir partie "Liens utiles" de la page d'accueil du cours</li>
+<li><b>Ressources :</b> site d'<a href="http://www.oswd.org/">Open Source Web Design</a>,
+qui propose des feuilles de style CSS à télécharger</li>
+</ul>
+<h2 id="preambule">Préambule</h2>
+<p>Créez un répertoire "TP1", dans lequel vous archiverez tous les fichiers à rendre dans ce TP. Créez un deuxième répertoire temporaire, dans lequel vous effectuerez les manipulations demandées (merci de ne placer dans "TP1" que les fichiers dont le rendu est demandé).</p>
+
+<h2 id="html">HTML et XHTML</h2>
+<p>Ouvrez, éditez et corrigez <a href="https://perso.liris.cnrs.fr/~lmedini/enseignement/M1IF03/TP/TP1/CV.html">cette page Web</a>. Itérez jusqu'à ce qu'elle soit sémantiquement correcte et valide en XHTML 1.0.</p>
+
+<ul>
+<li>Dans les différentes sections de votre CV, identifiez (i.e. spécifiez un attribut <span class="code">id</span>) les éléments importants de votre bloc principal (par exemple, les titres de niveau 2 ou 3, les items de liste ou les lignes d'un tableau).</li>
+<li>Dans le bloc de menu de chaque section, créez des sous-menus qui pointent vers les <em>fragments</em> correspondants de la section courante</li>
+<li>Vérifiez-en le bon fonctionnement</li>
+</ul>
+
+<h3 id="indications">Indications</h3>
+<ol>
+<li id="fragments">Ajout de liens internes<br/>
+<h4>Notion de lien vers un fragment</h4>
+<p><span style="text-decoration: underline;">Définition :</span> <em>Un fragment est un élément ou un sous-arbre constitué par un élément et ses sous-éléments.</em> Lorsque'un fragment est identifié par l'attribut <span class="code">id</span> d'un élément, on peut définir des liens vers ce fragment, plutôt que la totalité de la section qui le contient. Pour cela, il suffit de rajouter le caractère "<span class="code">#</span>" (dièse) à la fin de l'URL, suivi de l'id de l'élément visé. Cela indique au navigateur qu'il doit défiler dans la page pour que cet élément se retrouve en haut de l'écran (si possible).<br />
+Exemple : l'ancre de lien <span class="code"><a href="TP_client.html#fragments">&lt;a href="#fragments"&gt;</a></span> permet de se positionner dans cette section (voir code source de la page).</p>
+</li>
+<li>Vérifiez l'affichage de ce document sur les navigateurs installés sur votre machine et validez ce document avec le validateur du W3C : <a href="http://validator.w3.org/">http://validator.w3.org/</a>.</li>
+<li>&Eacute;ditez votre document avec XMLSpy uo Notepad++ et validez-le avec l'outil de validation de XMLSpy puis avec celui du W3C. Corrigez les erreurs jusqu'à obtenir un document valide.</li>
+<li>Sauvegardez ce fichier dans un répertoire "XHTML" de "TP1".</li>
+</ol>
+
+<h2 id="css">CSS</h2>
+<h3 id="css_creation">Création</h3>
+<ul>
+<li>Reprenez le CV en XHTML et rajoutez-y une référence à une feuille de style "CV.css".</li>
+<li>Écrivez cette feuille de style (à faire chez vous).</li>
+<li>Spécifiez les marges de la page et positionnez la photo à côté d'une zone de texte (aide : <a href="http://www.w3schools.com/css/css_float.asp">positionnement flottant sur W3Schools)</a>).</li>
+<li>Réenregistrez ces deux fichiers (XHTML et CSS) dans le dossier "XHTML"</li>
+</ul>
+
+<h3 id="css_js">Dynamisation de l'interface avec JavaScript</h3>
+
+<p>Dans cette partie, vous allez faire en sorte de n'afficher que la section demandée par l'utilisateur. Pour cela :</p>
+<ul>
+<li>créez une classe de style permettant de cacher ces blocs à l'aide de la propriété <span class="code">visibility</span> et attribuez-les aux différents éléments que vous aurez à masquer/afficher dans la page</li>
+<li>créez des fonctions JavaScript permettant de faire apparaître et disparaître un élément</li>
+<li>insérez ces fonctions dans l'en-tête de la page dans un élément <span class="code">&lt;script type="text/javascript"&gt;...&lt;/script&gt;</span></li>
+<li>interceptez le clic sur les éléments du menu à l'aide de l'attribut <span class="code">onclick</span> et déclenchez les fonctions JavaScript correspondantes en leur passant en paramètre les id des blocs correspondants</li>
+</ul>
+
+<h2 id="xml">XML</h2>
+<p>Pour commencer, récupérez le contenu du <a href="https://perso.liris.cnrs.fr/~lmedini/enseignement/M1IF03/TP/TP1">répertoire contenant les fichiers de ce premier TP</a>, et copiez-le sur votre compte. Ouvrez les fichiers CV_a_corriger.xml et CV.dtd dans XMLSpy.</p>
+<p>À l'aide des outils de vérification syntaxique et grammaticale, corrigez le document XML pour qu'il soit bien formé et valide par rapport à sa DTD (n'oubliez pas de ré-enregistrer ce document après chaque modification).</p>
+<p>Une fois ce document bien formé et valide, renommez-le en "CV.xml", et remplissez-en la structure avec les mêmes données que celles du document XHTML de la question précédente. Une fois cette manipulation faite, vérifiez que le document est toujours bien formé et valide et sauvegardez-le avec sa DTD dans un
+répertoire "XML".</p>
+<h2 id="dtd">DTD</h2>
+<p>Recopiez la DTD sous un autre nom, et modifiez cette copie pour que :</p>
+<ul>
+<li>d'autres étudiants que des M1 IF puissent écrire leur CV conformément à cette DTD</li>
+<li>il existe deux types de rubriques (éléments <span style="font-family: Courier New;">Rubrique1</span> et <span style="font-family: Courier New;">Rubrique2</span>)
+qui correspondent respectivement aux rubriques (<span style="font-family: Courier New;">Formation</span> et <span style="font-family: Courier New;">Experience</span>),
+et (<span style="font-family: Courier New;">Competences</span>
+et <span style="font-family: Courier New;">Divers</span>)
+; <span style="color: red;" onmouseover="javascript:afficheInfos('infos_DTD');" onmouseout="javascript:cacheInfos('infos_DTD');">séparez
+les différents types de contenus en fonction de cette distinction</span>.</li>
+</ul>
+<div id="infos_DTD" style="border: 1px solid black; background-color: rgb(255, 255, 255); visibility: hidden; position: absolute; left: 50%;"><span style="font-weight: bold;">
+Exemple
+de structure XML attendue :</span><br />
+<span style="font-family: Courier New;">&lt;Rubrique1&gt;<br />
+&nbsp; &lt;Item1&gt;<br />
+&nbsp; &nbsp; &lt;Date&gt;...&lt;/Date&gt;<br />
+&nbsp; &nbsp;
+&lt;Contenu&gt;...&lt;/Contenu&gt;<br />
+&nbsp; &lt;/Item1&gt;<br />
+&lt;/Rubrique1&gt;<br />
+&lt;Rubrique2&gt;<br />
+&nbsp; &lt;Item2&gt;<br />
+&nbsp; &nbsp;
+&lt;SousTitre&gt;...&lt;/SousTitre&gt;<br />
+&nbsp; &nbsp;
+&lt;Contenu&gt;...&lt;/Contenu&gt;<br />
+&nbsp; &nbsp;
+&lt;Contenu&gt;...&lt;/Contenu&gt;<br />
+&nbsp; &lt;/Item2&gt;<br />
+&lt;/Rubrique2&gt;</span></div>
+
+<h2 id="xsl">XSL</h2>
+<ul>
+<li>Reprenez votre fichier "CV.xml". Écrivez une feuille de
+style XSLT qui permet de transformer ce fichier en un fichier XHTML
+ressemblant à votre première version sauvegardée dans "XHTML". Pour
+cela, procédez incrémentalement (à chaque étape, utilisez l'outil de
+transformation d'XMLSpy pour générer le fichier XHTML et visualiser le
+résultat) :
+<ul>
+<li>générez un fichier XHTML vide (minimal conforme à la
+DTD)</li>
+<li>rajoutez une requête XPath pour récupérer le titre de
+ce document et l'insérer dans le fichier généré</li>
+<li>définissez les principaux templates de votre feuille de
+style et rajoutez-les dans la structure de votre arbre cible (avec
+uniquement des titres) et vérifiez qu'ils s'insèrent bien dans l'arbre
+cible au bon endroit et autant de fois que nécessaire</li>
+<li>rajoutez du contenu XHTML pour les templates</li>
+<li>faites de même pour les templates inclus dans les les
+templates principaux, etc.</li>
+</ul>
+</li>
+<li>Sauvegardez votre feuille de style XSLT dans un répertoire
+"XSLT".</li>
+</ul>
+
+<h2 id="svg">SVG</h2>
+<p>Créez un dossier "SVG" dans votre répertoire de rendu de TP, dans lequel vous travaillerez pour cette question. &Agrave; l'aide du pointeur de W3Schools sur SVG, utilisez l'outil de création SVG de XMLSpy pour réaliser une figure simple : créez un nouveau document, et choisissez le type SVG. Insérez un ou plusieurs éléments disponibles dans la palette "Elements" (à droite) dans la partie taggée "your graphic here" de votre document.</p>
+<p>Visualisez le résultat avec Firefox (IE n'intègre pas en
+standard de visualisateur SVG...). </p>
+<p>Faites ensuite une nouvelle page Web dans laquelle vous incluerez votre document SVG. Modifiez votre document pour qu'il représente un échiquier semblable à l'image ci-dessous. Rajouter à votre page le texte qui s'impose et faites en sorte que l'échiquier se redimensionne si vous redimensionnnez la page.<br />
+<img src="echiquier_vide.png" alt="echiquier vide"/></p>
+<h2 id="javascript">JavaScript</h2>
+<p>Rajoutez un bouton qui lance une fonction pour positionner dynamiquement les pièces comme sur l'image suivante.<br />
+<img src="echiquier_rempli.png" alt="echiquier rempli"/><br/>
+Les images contenant les pièces se trouvent dans le sous-répertoire "pieces" du dossier contenant cette page.</p>
+<h2 id="rendu">Rendu du TP</h2>
+<ul>
+<li>Récupérez le fichier "<a href="../Rendu/Rendu.xsd">Rendu.xsd</a>"</li>
+<li>Créez un fichier "contenu.xml" valide selon ce schéma et
+décrivant les contenus du répertoire "TP1"</li>
+<li>Placez ce fichier à la racine de votre répertoire "TP1" et
+zippez l'ensemble du répertoire</li>
+<li>Renommez votre fichier .zip : <em>MIF13_TP1_NomEtd1_NomEtd2.zip</em></li>
+<li>Déposez le fichier zippé sur Spiral Connect, dans le module "<a href="http://spiralconnect.univ-lyon1.fr/spiral/spiral.html#/activities/search_module/11710">Rendu MIF13</a>"</li>
+</ul>
+<p><span style="text-decoration: underline; font-weight: bold;">Attention&nbsp;:</span><br />
+Vérifiez bien que les lien entre les différents fichiers que vous allez rendre ne font pas référence à votre système de fichiers propre.<br />
+Pour la première partie : inutile de rendre vos fichiers HTML intermédiaires : tout ce qui n'est pas en XHTML ne sera pas noté</p>
+</div>
+<div id="validation">
+<a href="http://validator.w3.org/check?uri=referer"><img src="http://www.w3.org/Icons/valid-xhtml10" alt="Valid XHTML 1.0 Transitional" style="height: 31px; width: 88px" /></a>
+</div>
+</body></html>

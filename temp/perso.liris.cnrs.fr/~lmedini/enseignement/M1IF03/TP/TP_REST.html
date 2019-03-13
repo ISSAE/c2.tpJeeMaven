@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="application/xml+xhtml; charset=utf-8" />
+<meta http-equiv="Content-Language" content="fr" />
+<meta http-equiv="Author" content="Lionel Médini" />
+<link rel="stylesheet" type="text/css" media="screen" href="https://perso.liris.cnrs.fr/~lmedini/enseignement/medini.css" />
+<link rel="stylesheet" type="text/css" media="print" href="https://perso.liris.cnrs.fr/~lmedini/enseignement/medini-print.css" />
+<script type="text/javascript" src="https://perso.liris.cnrs.fr/~lmedini/js/menu.js"></script>
+<title>M1IF03 - TP4 : REST</title>
+</head>
+<body>
+<div id="principale">
+<h1>TP 4 : initiation aux services Web (programmation REST)</h1>
+<h2>Objectifs p&eacute;dagogiques du TP</h2>
+<ul>
+<li>Comprendre les grands principes de l'approche REST</li>
+<li>Se familiariser avec la programmation orientée-ressource</li>
+<li>Utiliser les annotations REST de Spring</li>
+</ul>
+
+<h2 id="references">Références</h2>
+<ul>
+<li><span style="font-weight: bold;">Cours :</span> voir le <a href="http://liris.cnrs.fr/~pchampin/enseignement/rest/">cours REST de Pierre-Antoine Champin</a></li>
+<li>Une explication de la <a href="http://ruben.verborgh.org/blog/2012/09/27/the-object-resource-impedance-mismatch/">sémantique des verbes HTTP</a> et la différence entre la programmation orientée-objet et orientée-ressource</li>
+<li>Un <a href="https://spring.io/understanding/REST">résumé des principales caractéristiques de REST à implémenter</a> vu par Spring</li>
+<li>Deux tutoriels Spring : <a href="https://spring.io/guides/gs/rest-service/">Getting started</a> et <a href="https://spring.io/guides/tutorials/bookmarks/">Tuto complet</a> (rappel : vous n'avez pas droit à Spring Boot)</li>
+<li>La <a href="http://docs.spring.io/spring/docs/current/spring-framework-reference/html/mvc.html">Documentation officielle de Spring Web MVC</a></li>
+</ul>
+
+<h2 id="preambule">Préambule</h2>
+<p>Dans ce TP, vous repartirez de l'application de back-office du chat en Spring Web MVC réalisée dans le TP précédent. Vous l'améliorerez pour faire en sorte que les objets métier de cette application soient gérés sous forme de ressources.</p>
+<p>Remarque : l'authentification en REST étant un problème complexe, vous conserverez la méthode utilisée dans le TP précédent (cookies + Filter).</p>
+
+<h2 id="ressources">Ressources</h2>
+<p>Logiquement, au TP précédent, vous avez transformé tous les objets manipulés côté serveur en ressources. Le travail qui doit déjà être fait est que les ressources exposées par votre application (utilisateurs, salons, messages), ont chacune une URI qui lui est propre et que le serveur renvoie une représentation de cette ressource à une requête vers cette URI. Pour cela, vous devez avoir :</p>
+<ul>
+<li>un contrôleur Spring qui récupère les requêtes pour chaque type de ressource</li>
+<li>des composants (beans) capables de gérer le métier de ces ressources et dont le cycle de vie (création / destruction) est géré par le contrôleur</li>
+<li>des méthodes (Java) du contrôleur qui réalisent le mapping entre les méthodes (HTTP) des requêtes et l'appel (getters / setters) des beans</li>
+<li>un <span class="code">ViewResolver</span> qui renvoie une représentation (vue) de la ressource demandée en fonction de la valeur de retour du contrôleur</li>
+</ul>
+
+<h3 id="metier">Métier de l'application</h3>
+<p>&Agrave; l'aide de la documentation indiquée dans la partie <a href="TP_REST.html#references">Références</a>, étendez votre application pour qu'elle expose, en accord avec la sémantique des verbes HTTP, les ressources et les fonctionnalités suivantes :</p>
+<ul>
+<li>Utilisateur
+<ul>
+<li>Récupérer le pseudo et la liste des salons auxquels il a participé</li>
+<li>Modifier le pseudo</li>
+</ul></li>
+<li>salon
+<ul>
+<li>Récupérer la liste des messages</li>
+<li>Récupérer le nombre de messages</li>
+<li>Récupérer tous les messages envoyés après un message donné, dont l'id sera passé en paramètre</li>
+<li>Ajouter un message</li>
+<li>Supprimer un salon</li>
+</ul></li>
+<li>Message
+<ul>
+<li>Récupérer les informations du message (auteur, texte)</li>
+<li>Modifier le contenu du dernier message d'un salon (doit renvoyer une erreur si ce n'est pas le dernier message)</li>
+<li>Supprimer le dernier message d'un salon (doit renvoyer une erreur si ce n'est pas le dernier message)</li>
+</ul></li>
+</ul>
+<p>Remarque : vous pouvez créer d'autres sous-ressources qui vous paraissent appropriées pour réaliser ces traitements.</p>
+
+<h2 id="negociation">Négociation de contenus</h2>
+<!--p>En utilisant un <a href="http://docs.spring.io/spring/docs/current/spring-framework-reference/html/mvc.html#mvc-multiple-representations">ContentNegotiatingViewResolver</a-->
+
+<p>Utilisez la doc située <a href="https://spring.io/blog/2013/05/11/content-negotiation-using-spring-mvc">ici</a> pour faire en sorte qu'en fonction des headers HTTP de la requête, votre serveur renvoie une représentation des ressources différente :</p>
+<ul>
+<li>JSON si le client a indiqué qu'il l'acceptait</li>
+<li>XML si le client a indiqué qu'il l'acceptait</li>
+<li>Sinon, HTML</li>
+</ul>
+
+<h2 id="erreurs">Gestion des codes de statut et d'erreur</h2>
+<p>En utilisant un <a href="http://docs.spring.io/spring/docs/current/spring-framework-reference/html/mvc.html#mvc-exceptionhandlers">HandlerExceptionResolver</a>, gérez différentes exceptions comme indiqué dans la documentation. Commentez votre code pour indiquer comment les obtenir lors de la correction.</p>
+
+<h2 id="hypermedia">Hypermédia (bonus)</h2>
+<p>Faites en sorte que les représentations de chaque ressource contiennent un maximum de liens explicites vers les ressources apparentées ; par exemple, la représentation du salon devrait contenir un lien (permalink) vers chaque message.</p>
+<p>Par ailleurs lorsqu'une ressource a été créée, un lien doit être renvoyé dans (header HTTP <span class="code">location</span> de la réponse), contenant l'URI de cette nouvelle ressource.</p>
+
+<h2 id="rendu">Instructions de rendu</h2>
+<p>Vous pousserez une nouvelle version de votre projet sur la forge, avec les modifications demandées par le passage à REST de votre application Spring. Le dernier commit doit dater au plus tard du <strong>dimanche 2 décembre 2018</strong> au soir.</p>
+
+</div>
+<div id="license"><a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/fr/"><img alt="Licence Creative Commons" style="border-width:0" src="http://i.creativecommons.org/l/by-nc-sa/3.0/fr/88x31.png" /></a></div>
+
+<div id="validation">
+<a href="http://validator.w3.org/check?uri=referer"><img src="http://www.w3.org/Icons/valid-xhtml10" alt="Valid XHTML 1.0 Strict" style="height: 31px; width: 88px" /></a>
+</div>
+</body></html>
